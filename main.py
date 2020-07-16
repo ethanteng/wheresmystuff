@@ -2,6 +2,7 @@ from flask import Flask, request, Response
 import json
 import requests
 import MySQLdb
+import config
 
 app = Flask(__name__)
 
@@ -21,7 +22,7 @@ def respond():
 	
 def send_email(tracking_code, status, est_delivery_date, carrier):
 	# Setup MySQL Connection
-	db = MySQLdb.connect(host="localhost", user="root", passwd="wheresmystuffC0", db="wheresmystuff")
+	db = MySQLdb.connect(host="localhost", user="root", passwd=config.db_password, db="wheresmystuff")
 	cursor = db.cursor()
 	
 	# Find user associated with this package
@@ -41,7 +42,7 @@ def send_email(tracking_code, status, est_delivery_date, carrier):
 	
 	# Send email
 	api_url = "https://api.mailgun.net/v3/sandbox6441ed402cbe4179802eb8bf0af5d96d.mailgun.org/messages"
-	api_key = "717f876718954c645fc815d5a838afba-87c34c41-f434249b"
+	api_key = config.mailgun_api_key
 	requests.post(api_url,
 			auth=("api",api_key),
 			data={"from": "Support at WheresMyStuff<support@sandbox6441ed402cbe4179802eb8bf0af5d96d.mailgun.org>",

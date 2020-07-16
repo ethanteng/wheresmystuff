@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import config
 
 def checkName(name):
   checkName = input("Is your name " + name + "? ") 
@@ -15,7 +16,7 @@ checkName("Ethan")
 import MySQLdb
 
 # Setup MySQL Connection
-db = MySQLdb.connect(host="localhost", user="root", passwd="wheresmystuffC0", db="python")
+db = MySQLdb.connect(host="localhost", user="root", passwd=config.db_password, db="python")
 cursor = db.cursor()
 
 # Insert a row into our table
