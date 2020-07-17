@@ -1,0 +1,16 @@
+Local env:
+
+export FLASK_APP=main.py
+python3 -m flask run
+cp ngrok_test.yml /path/to/.ngrok2/ngrok.yml
+[add ngrok_auth_token to ngrok.yml]
+cd /ngrok/directory
+./ngrok start --all --config="/path/to/.ngrok2/ngrok.yml"
+
+
+
+Production env:
+
+cp ngrok.yml /path/to/.ngrok2
+[add ngrok_auth_token to ngrok.yml]
+nohup ngrok start --all --config="/path/to/.ngrok2/ngrok.yml" &

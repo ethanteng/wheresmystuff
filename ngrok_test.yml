@@ -1,0 +1,6 @@
+authtoken: 
+tunnels:
+    default:
+        proto: http
+        addr: 5000
+        subdomain: wheresmystuff-test
