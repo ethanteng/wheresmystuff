@@ -38,7 +38,7 @@ def send_email(tracking_code, status, est_delivery_date, carrier):
 	user = cursor.fetchone()
 	firstname = user[0]
 	lastname = user[1]
-	email = user[2]
+	email = str(user[2])
 	
 	# Send email
 	api_url = "https://api.mailgun.net/v3/sandbox6441ed402cbe4179802eb8bf0af5d96d.mailgun.org/messages"
@@ -46,7 +46,7 @@ def send_email(tracking_code, status, est_delivery_date, carrier):
 	requests.post(api_url,
 			auth=("api",api_key),
 			data={"from": "Support at WheresMyStuff<support@sandbox6441ed402cbe4179802eb8bf0af5d96d.mailgun.org>",
-				"to": str(email),
+				"to": email,
 				"bcc": "ethanteng@gmail.com",
 				"subject": "Update about your " + str(description),
 				"text": "Tracking code: " + str(tracking_code) + "\n" + "Delivery status: " + str(status) + "\n" + "Estimated delivery date: " + str(est_delivery_date) + "\n" + "Carrier: " + str(carrier)})
