@@ -14,8 +14,8 @@ def respond():
 	update = request.json
 	tracking_code = update["result"]["tracking_code"]
 	status = str(update["result"]["status"])
-	est_delivery_date_str = str(update["result"]["est_delivery_date"])
-	est_delivery_date = datetime.strptime(est_delivery_date_str,"%m/%d/%Y %H:%M")
+	est_delivery_date_obj = update["result"]["est_delivery_date"]
+	est_delivery_date = est_delivery_date_obj.strftime("%m/%d/%Y %H:%M")
 	carrier = str(update["result"]["carrier"])
 
 	send_email(tracking_code, status, est_delivery_date, carrier)
