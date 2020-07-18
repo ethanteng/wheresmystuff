@@ -21,9 +21,9 @@ CREATE TABLE packages (
 CREATE TABLE trackers (
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   package_id INT(6) UNSIGNED NOT NULL,
-  tracker_id VARCHAR(100) UNIQUE NOT NULL,
+  tracker_id VARCHAR(100) UNIQUE,
   status VARCHAR(100),
-  est_delivery_date DATE,
+  est_delivery_date DATETIME,
   current_city VARCHAR(50),
   current_state VARCHAR(50),
   current_country VARCHAR(50),

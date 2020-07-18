@@ -5,7 +5,7 @@ python3 -m flask run
 cp ngrok_test.yml /path/to/.ngrok2/ngrok.yml
 [add ngrok_auth_token to ngrok.yml]
 cd /ngrok/directory
-./ngrok start --all --config="/path/to/.ngrok2/ngrok.yml"
+nohup ./ngrok start --all --config="/path/to/.ngrok2/ngrok.yml" &
 
 
 
