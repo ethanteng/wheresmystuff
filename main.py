@@ -3,6 +3,8 @@ import json
 import requests
 import MySQLdb
 import config
+import datetime
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -12,15 +14,30 @@ def respond():
 	update = request.json
 	tracking_code = update["result"]["tracking_code"]
 	status = update["result"]["status"]
-	est_delivery_date = update["result"]["est_delivery_date"]
+	origin = update["result"]["carrier_detail"]["origin_location"]
+	destination = update["result"]["carrier_detail"]["destination_location"]
 	carrier = update["result"]["carrier"]
 
-	send_email(tracking_code, status, est_delivery_date, carrier)
+	# Formatting the delivery date to be more human-readable
+	est_delivery_date_str = str(update["result"]["est_delivery_date"])
+	est_delivery_date_obj = datetime.strptime(est_delivery_date_str, "%Y-%m-%dT%H:%M:%SZ")
+	est_delivery_date = est_delivery_date_obj.strftime("%b %d %Y %-I:%M%p")
+
+	# Get the most recent tracking details
+	tracking_details = update["result"]["tracking_details"]
+	num_tracking_details = len(tracking_details)
+	most_recent_detail = update["result"]["tracking_details"][num_tracking_details-1]
+	status_detail = most_recent_detail["message"]
+	current_city = most_recent_detail["tracking_location"]["city"]
+	current_state = most_recent_detail["tracking_location"]["state"]
+	current_country = most_recent_detail["tracking_location"]["country"]
+
+	send_email(tracking_code, status, status_detail, est_delivery_date, carrier, origin, destination, current_city, current_state, current_country)
 	
 	return Response(status=200)
 	
 	
-def send_email(tracking_code, status, est_delivery_date, carrier):
+def send_email(tracking_code, status, status_detail, est_delivery_date, carrier, origin, destination, current_city, current_state, current_country):
 	# Setup MySQL Connection
 	db = MySQLdb.connect(host="localhost", user="root", passwd=config.db_password, db="wheresmystuff")
 	cursor = db.cursor()
@@ -49,4 +66,10 @@ def send_email(tracking_code, status, est_delivery_date, carrier):
 				"to": str(email),
 				"bcc": "ethanteng@gmail.com",
 				"subject": "Update about your " + str(description),
-				"text": "Tracking code: " + str(tracking_code) + "\n" + "Delivery status: " + str(status) + "\n" + "Estimated delivery date: " + str(est_delivery_date) + "\n" + "Carrier: " + str(carrier)})
+				"text": "Delivery status: " + str(status) + "\n" +
+						"Details: " + str(status_detail) + "\n" +
+						"Current location:" + str(current_city) + " " + str(current_state) + " " + str(current_country) + "\n" +
+						"Destination: " + str(destination) + "\n" +
+						"Estimated delivery date: " + str(est_delivery_date) + "\n" +
+						"Carrier: " + str(carrier) + "\n" +
+						"Tracking code: " + str(tracking_code)})
