@@ -1,0 +1,31 @@
+CREATE TABLE users (
+  id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  firstname VARCHAR(30) NOT NULL,
+  lastname VARCHAR(30) NOT NULL,
+  email VARCHAR(30) UNIQUE NOT NULL,
+  phone VARCHAR(30)
+);
+
+
+
+CREATE TABLE packages (
+  id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id INT(6) UNSIGNED NOT NULL,
+  tracking_code VARCHAR(100) NOT NULL,
+  carrier VARCHAR(30),
+  description VARCHAR(50)
+);
+
+
+
+CREATE TABLE trackers (
+  id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  package_id INT(6) UNSIGNED NOT NULL,
+  tracker_id VARCHAR(100) UNIQUE NOT NULL,
+  status VARCHAR(100),
+  est_delivery_date DATE,
+  current_city VARCHAR(50),
+  current_state VARCHAR(50),
+  current_country VARCHAR(50),
+  updated_at DATETIME
+);
