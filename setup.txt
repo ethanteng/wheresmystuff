@@ -13,4 +13,4 @@ Production env:
 
 cp ngrok.yml /path/to/.ngrok2
 [add ngrok_auth_token to ngrok.yml]
-nohup ngrok start --all --config="/path/to/.ngrok2/ngrok.yml" &
+nohup ./ngrok start --all --config="/path/to/.ngrok2/ngrok.yml" &
