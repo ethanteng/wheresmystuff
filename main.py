@@ -13,10 +13,14 @@ app = Flask(__name__)
 def respond():
 	update = request.json
 	tracking_code = update["result"]["tracking_code"]
-	status = str(update["result"]["status"])
-	est_delivery_date_obj = update["result"]["est_delivery_date"]
-	est_delivery_date = est_delivery_date_obj.strftime("%m/%d/%Y %H:%M")
-	carrier = str(update["result"]["carrier"])
+	status = update["result"]["status"]
+
+	# Formatting the delivery date to be more human-readable
+	est_delivery_date_str = str(update["result"]["est_delivery_date"])
+	est_delivery_date_obj = datetime.strptime(est_delivery_date_str, "%Y-%m-%dT%H:%M:%SZ")
+	est_delivery_date = est_delivery_date_obj.strftime("%b %d %Y %-I:%M%p")
+	
+	carrier = update["result"]["carrier"]
 
 	send_email(tracking_code, status, est_delivery_date, carrier)
 	
@@ -33,15 +37,15 @@ def send_email(tracking_code, status, est_delivery_date, carrier):
 	cursor.execute(query_packages, [tracking_code])
 	result = cursor.fetchone()
 	user_id = result[0]
-	description = str(result[1])
+	description = result[1]
 	
 	# Get user name and email
 	query_users = """SELECT firstname, lastname, email FROM users WHERE id = %s"""
 	cursor.execute(query_users, [user_id])
 	user = cursor.fetchone()
-	firstname = str(user[0])
-	lastname = str(user[1])
-	email = str(user[2])
+	firstname = user[0]
+	lastname = user[1]
+	email = user[2]
 	
 	# Send email
 	api_url = "https://api.mailgun.net/v3/sandbox6441ed402cbe4179802eb8bf0af5d96d.mailgun.org/messages"
@@ -49,7 +53,7 @@ def send_email(tracking_code, status, est_delivery_date, carrier):
 	requests.post(api_url,
 			auth=("api",api_key),
 			data={"from": "Support at WheresMyStuff<support@sandbox6441ed402cbe4179802eb8bf0af5d96d.mailgun.org>",
-				"to": email,
+				"to": str(email),
 				"bcc": "ethanteng@gmail.com",
-				"subject": "Update about your " + description,
-				"text": "Tracking code: " + str(tracking_code) + "\n" + "Delivery status: " + status + "\n" + "Estimated delivery date: " + est_delivery_date + "\n" + "Carrier: " + carrier})
+				"subject": "Update about your " + str(description),
+				"text": "Tracking code: " + str(tracking_code) + "\n" + "Delivery status: " + str(status) + "\n" + "Estimated delivery date: " + str(est_delivery_date) + "\n" + "Carrier: " + str(carrier)})
