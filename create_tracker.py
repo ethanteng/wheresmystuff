@@ -6,5 +6,5 @@ easypost.api_key = config.easypost_test_api_key
 #easypost.api_key = config.easypost_prod_api_key
 
 tracker = easypost.Tracker.create(
-	tracking_code="EZ1000000001"
+	tracking_code="EZ3000000003"
 )
