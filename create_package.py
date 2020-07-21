@@ -7,7 +7,7 @@ db = MySQLdb.connect(host="localhost", user="root", passwd=config.db_password, d
 cursor = db.cursor()
 
 # Create a new package
-cursor.execute("INSERT INTO packages (user_id, tracking_code, description) VALUES (1, 'EZ3000000003', 'Test package 3')")
+cursor.execute("INSERT INTO packages (user_id, tracking_code, description) VALUES (1, 'EZ4000000004', 'Test package 4')")
 pkg_id = cursor.lastrowid
 
 # Create the associated tracker
