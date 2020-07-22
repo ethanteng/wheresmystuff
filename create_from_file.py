@@ -1,15 +1,17 @@
 #!/usr/bin/python3
+import sys
+import os
+import csv
 import create_user
 import create_package
-import create_tracker
 
-# New entry
-email = "davidteng78@yahoo.com"
-first_name = "David"
-last_name = "Teng"
-tracking_code = "EZ1000000001"
-description = "Fake package 1"
+filepath = sys.argv[1]
+if not os.path.isfile(filepath):
+	sys.exit()
 
-user_id = create_user.create_user(first_name, last_name, email)
-create_package.create_package(user_id, tracking_code, description)
-create_tracker.create_tracker(tracking_code)
+with open(filepath, mode='r') as csv_file:
+	csv_reader = csv.DictReader(csv_file)
+	for row in csv_reader:
+
+		user_id = create_user.create_user(row["first_name"], row["last_name"], row["email"])
+		create_package.create_package(user_id, row["tracking_code"], row["description"])
