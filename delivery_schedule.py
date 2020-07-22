@@ -3,6 +3,7 @@ import MySQLdb
 import config
 import requests
 import datetime
+from datetime import datetime
 
 
 def get_packages_for_user(user_id):
@@ -24,13 +25,23 @@ def get_packages_for_user(user_id):
 
 		cursor.execute(get_trackers_query, get_trackers_parameters)
 		tracker = cursor.fetchone()
-		if tracker["est_delivery_date"] >= datetime.datetime.now():
+		if tracker["status"] != "delivered": # Skip packages that have already been delivered
 			
-			index = get_index_of_date(user_packages, tracker["est_delivery_date"])
-			if index == -1:
-				user_packages.append([tracker["est_delivery_date"], package])
-			else:
-				user_packages[index].append(package)
+			if tracker["status"] in ("unknown","pre_transit","in_transit","out_for_delivery","available_for_pickup"):
+				index = get_index_of_date(user_packages, tracker["est_delivery_date"])
+
+				if index == -1:
+					user_packages.append([tracker["est_delivery_date"], package])
+				else:
+					user_packages[index].append(package)
+			else: # return_to_sender, failure, cancelled, error
+				fake_date = datetime.strptime("January 31, 2100", "%B %d, %Y")
+				index = get_index_of_date(user_packages, fake_date)
+
+				if index == -1:
+					user_packages.append([fake_date, package])
+				else:
+					user_packages[index].append(package)
 
 	return(user_packages)
 
@@ -56,30 +67,34 @@ def generate_delivery_schedule_for_user(user, user_packages):
 	try:
 		for user_package in user_packages:
 			
-			delivery_date = user_package[0].strftime("%A %B %d, %Y")
-			email_body = email_body + "Arriving on " + delivery_date + ": " + "\n"
+			fake_date = datetime.strptime("January 31, 2100", "%B %d, %Y")
+			if user_package[0] < fake_date:
+				delivery_date = user_package[0].strftime("%A %B %d, %Y")
+				email_body = email_body + "Arriving on " + delivery_date + ": " + "\n"
+			else:
+				email_body = email_body + "Delivery unknown for: " + "\n"
+
 
 			for i in range(1, len(user_package)):
 
 				description = str(user_package[i]["description"])
 				carrier = str(user_package[i]["carrier"])
 				tracking_code = str(user_package[i]["tracking_code"])
+				current_status = get_current_status(user_package[i])
+				current_location = get_current_location(user_package[i])
 
-				if (carrier != 'None'):
-					email_body = email_body + description + " (tracking code " + tracking_code + " to be delivered via " + carrier + ")\n"
-				else:
-					email_body = email_body + description + " (tracking code " + tracking_code + ")\n"
+				email_body = email_body + description + " (currently " + current_status + " at " + current_location + ")\n"
 			else:
 				email_body = email_body + "\n"
 	except:
-		print("No packages for user_id " + str(user["id"]))
+		print("Exception in generate_delivery_schedule_for_user()")
 
 	send_email(user, email_body)
 
 
 def send_email(user, email_body):
 	to_email = str(user["email"])
-	subject = "Your scheduled deliveries"
+	subject = "Your upcoming deliveries"
 	api_url = "https://api.mailgun.net/v3/sandbox6441ed402cbe4179802eb8bf0af5d96d.mailgun.org/messages"
 	api_key = config.mailgun_api_key
 	requests.post(api_url,
@@ -89,6 +104,36 @@ def send_email(user, email_body):
 				"bcc": "ethanteng@gmail.com",
 				"subject": subject,
 				"text": email_body})
+
+
+
+def get_current_status(package):
+	# Setup MySQL Connection
+	db = MySQLdb.connect(host="localhost", user="root", passwd=config.db_password, db="wheresmystuff")
+	cursor = db.cursor(MySQLdb.cursors.DictCursor)
+
+	query = """SELECT * FROM trackers WHERE package_id = %s"""
+	parameters = [package["id"]]
+	cursor.execute(query, parameters)
+	tracker = cursor.fetchone()
+
+	return(str(tracker["status"]))
+
+
+
+def get_current_location(package):
+	# Setup MySQL Connection
+	db = MySQLdb.connect(host="localhost", user="root", passwd=config.db_password, db="wheresmystuff")
+	cursor = db.cursor(MySQLdb.cursors.DictCursor)
+
+	query = """SELECT * FROM trackers WHERE package_id = %s"""
+	parameters = [package["id"]]
+	cursor.execute(query, parameters)
+	tracker = cursor.fetchone()
+
+	location = str(tracker["current_city"]) + " " + str(tracker["current_state"])
+	return(location)
+
 
 
 # Setup MySQL Connection

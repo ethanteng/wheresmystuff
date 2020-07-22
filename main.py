@@ -27,7 +27,6 @@ def respond():
 	# Formatting the updated at date to be more human readable
 	updated_at_date_str = str(update["result"]["updated_at"])
 	updated_at_date_obj = datetime.strptime(updated_at_date_str, "%Y-%m-%dT%H:%M:%SZ")
-	#updated_at_date = updated_at_date_obj.strftime("%b %d %Y %-I:%M%p")
 
 	# Get the most recent tracking details
 	tracking_details = update["result"]["tracking_details"]
@@ -52,8 +51,6 @@ def update_tracker(tracking_code, tracker_id, status, est_delivery_date, current
 	# Find package associated with this tracker
 	query_packages = """SELECT id FROM packages WHERE tracking_code = %s"""
 	cursor.execute(query_packages, [tracking_code])
-	#result = cursor.fetchone()
-	#pkg_id = result[0]
 	pkg_id = cursor.fetchone()
 
 	# Update tracker db table
