@@ -4,6 +4,7 @@ import config
 import requests
 import datetime
 from datetime import datetime
+import email_helper
 
 
 def get_packages_for_user(user_id):
@@ -93,18 +94,11 @@ def generate_delivery_schedule_for_user(user, user_packages):
 
 
 def send_email(user, email_body):
-	to_email = str(user["email"])
+	from_addr = "Support at WheresMyStuff<support@sandbox6441ed402cbe4179802eb8bf0af5d96d.mailgun.org>"
+	to_addr = str(user["email"])
+	bcc_addr = "ethanteng@gmail.com"
 	subject = "Your upcoming deliveries"
-	api_url = "https://api.mailgun.net/v3/sandbox6441ed402cbe4179802eb8bf0af5d96d.mailgun.org/messages"
-	api_key = config.mailgun_api_key
-	requests.post(api_url,
-			auth=("api",api_key),
-			data={"from": "Support at WheresMyStuff<support@sandbox6441ed402cbe4179802eb8bf0af5d96d.mailgun.org>",
-				"to": str(to_email),
-				"bcc": "ethanteng@gmail.com",
-				"subject": subject,
-				"text": email_body})
-
+	email_helper.send_via_mailgun(from_addr, to_addr, bcc_addr, subject, email_body)
 
 
 def get_current_status(package):

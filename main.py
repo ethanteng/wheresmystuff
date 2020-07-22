@@ -5,6 +5,7 @@ import MySQLdb
 import config
 import datetime
 from datetime import datetime
+import email_helper
 
 app = Flask(__name__)
 @app.route('/webhook', methods=['POST'])
@@ -83,18 +84,15 @@ def send_email(tracking_code, status, status_detail, est_delivery_date, carrier,
 	email = user[2]
 	
 	# Send email
-	api_url = "https://api.mailgun.net/v3/sandbox6441ed402cbe4179802eb8bf0af5d96d.mailgun.org/messages"
-	api_key = config.mailgun_api_key
-	requests.post(api_url,
-			auth=("api",api_key),
-			data={"from": "Support at WheresMyStuff<support@sandbox6441ed402cbe4179802eb8bf0af5d96d.mailgun.org>",
-				"to": str(email),
-				"bcc": "ethanteng@gmail.com",
-				"subject": "Update about your " + str(description),
-				"text": "Delivery status: " + str(status) + "\n" +
-						"Details: " + str(status_detail) + "\n" +
-						"Current location:" + str(current_city) + " " + str(current_state) + " " + str(current_country) + "\n" +
-						"Destination: " + str(destination) + "\n" +
-						"Estimated delivery date: " + str(est_delivery_date) + "\n" +
-						"Carrier: " + str(carrier) + "\n" +
-						"Tracking code: " + str(tracking_code)})
+	from_addr = "Support at WheresMyStuff<support@sandbox6441ed402cbe4179802eb8bf0af5d96d.mailgun.org>"
+	to_addr = str(email)
+	bcc_addr = "ethanteng@gmail.com"
+	subject = "Update about your " + str(description)
+	email_body = "Delivery status: " + str(status) + "\n" +
+					"Details: " + str(status_detail) + "\n" +
+					"Current location:" + str(current_city) + " " + str(current_state) + " " + str(current_country) + "\n" +
+					"Destination: " + str(destination) + "\n" +
+					"Estimated delivery date: " + str(est_delivery_date) + "\n" +
+					"Carrier: " + str(carrier) + "\n" +
+					"Tracking code: " + str(tracking_code)
+	email_helper.send_via_mailgun(from_addr, to_addr, bcc_addr, subject, email_body)
