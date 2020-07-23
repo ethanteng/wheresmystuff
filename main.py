@@ -88,11 +88,13 @@ def send_email(tracking_code, status, status_detail, est_delivery_date, carrier,
 	to_addr = str(email)
 	bcc_addr = "ethanteng@gmail.com"
 	subject = "Update about your " + str(description)
-	email_body = "Delivery status: " + str(status) + "\n" +
-					"Details: " + str(status_detail) + "\n" +
-					"Current location:" + str(current_city) + " " + str(current_state) + " " + str(current_country) + "\n" +
-					"Destination: " + str(destination) + "\n" +
-					"Estimated delivery date: " + str(est_delivery_date) + "\n" +
-					"Carrier: " + str(carrier) + "\n" +
-					"Tracking code: " + str(tracking_code)
-	email_helper.send_via_mailgun(from_addr, to_addr, bcc_addr, subject, email_body)
+	email_json = {
+		"status": str(status),
+		"status_detail": str(status_detail),
+		"current_location": str(current_city) + " " + str(current_state) + " " + str(current_country),
+		"destination": str(destination),
+		"est_delivery_date": str(est_delivery_date),
+		"carrier": str(carrier),
+		"tracking_code": str(tracking_code)
+	}
+	email_helper.send_update_via_mailgun(from_addr, to_addr, bcc_addr, subject, email_json)

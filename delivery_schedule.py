@@ -93,12 +93,12 @@ def generate_delivery_schedule_for_user(user, user_packages):
 	send_email(user, email_body)
 
 
-def send_email(user, email_body):
+def send_email(user, email_json):
 	from_addr = "Support at WheresMyStuff<support@sandbox6441ed402cbe4179802eb8bf0af5d96d.mailgun.org>"
 	to_addr = str(user["email"])
 	bcc_addr = "ethanteng@gmail.com"
 	subject = "Your upcoming deliveries"
-	email_helper.send_via_mailgun(from_addr, to_addr, bcc_addr, subject, email_body)
+	email_helper.send_schedule_via_mailgun(from_addr, to_addr, bcc_addr, subject, email_json)
 
 
 def get_current_status(package):
@@ -114,7 +114,6 @@ def get_current_status(package):
 	return(str(tracker["status"]))
 
 
-
 def get_current_location(package):
 	# Setup MySQL Connection
 	db = MySQLdb.connect(host="localhost", user="root", passwd=config.db_password, db="wheresmystuff")
@@ -127,7 +126,6 @@ def get_current_location(package):
 
 	location = str(tracker["current_city"]) + " " + str(tracker["current_state"])
 	return(location)
-
 
 
 # Setup MySQL Connection
