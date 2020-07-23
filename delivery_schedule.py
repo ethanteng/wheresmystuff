@@ -63,41 +63,40 @@ def get_index_of_date(array_to_search, date_to_find):
 
 def generate_delivery_schedule_for_user(user, user_packages):
 	user_packages.sort()
-	email_body = ""
+	email_json = {}
 
 	try:
 		for user_package in user_packages:
-			
+			json_key = ""
 			fake_date = datetime.strptime("January 31, 2100", "%B %d, %Y")
 			if user_package[0] < fake_date:
 				delivery_date = user_package[0].strftime("%A %B %d, %Y")
-				email_body = email_body + "Arriving on " + delivery_date + ": " + "\n"
+				json_key = "Arriving on " + delivery_date + ":"
 			else:
-				email_body = email_body + "Delivery unknown for: " + "\n"
+				json_key = "Delivery unknown for:"
 
 
+			json_value = ""
 			for i in range(1, len(user_package)):
-
 				description = str(user_package[i]["description"])
 				carrier = str(user_package[i]["carrier"])
 				tracking_code = str(user_package[i]["tracking_code"])
 				current_status = get_current_status(user_package[i])
 				current_location = get_current_location(user_package[i])
+				json_value = json_value + description + " (currently " + current_status + " at " + current_location + ")"
 
-				email_body = email_body + description + " (currently " + current_status + " at " + current_location + ")\n"
-			else:
-				email_body = email_body + "\n"
+			email_json.update({"packages" : [{"date" : json_key, "items" : json_value}]})
 	except:
 		print("Exception in generate_delivery_schedule_for_user()")
 
-	send_email(user, email_body)
+	send_email(user, email_json)
 
 
 def send_email(user, email_json):
 	from_addr = "Support at WheresMyStuff<support@sandbox6441ed402cbe4179802eb8bf0af5d96d.mailgun.org>"
 	to_addr = str(user["email"])
 	bcc_addr = "ethanteng@gmail.com"
-	subject = "Your upcoming deliveries"
+	subject = "Your schedule of deliveries"
 	email_helper.send_schedule_via_mailgun(from_addr, to_addr, bcc_addr, subject, email_json)
 
 

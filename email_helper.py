@@ -19,7 +19,7 @@ def send_update_via_mailgun(from_addr, to_addr, bcc_addr, email_subject, email_j
 
 
 def send_schedule_via_mailgun(from_addr, to_addr, bcc_addr, email_subject, email_json):
-	store_schedule_template()
+	#store_schedule_template()
 
 	api_url = "https://api.mailgun.net/v3/sandbox6441ed402cbe4179802eb8bf0af5d96d.mailgun.org/messages"
 	api_key = config.mailgun_api_key
