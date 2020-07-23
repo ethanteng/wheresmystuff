@@ -83,9 +83,10 @@ def generate_delivery_schedule_for_user(user, user_packages):
 				tracking_code = str(user_package[i]["tracking_code"])
 				current_status = get_current_status(user_package[i])
 				current_location = get_current_location(user_package[i])
-				json_value = json_value + description + " (currently " + current_status + " at " + current_location + ")"
+				json_value = json_value + description + " (currently " + current_status + " at " + current_location + ")" + "<br>"
 
-			email_json.update({"packages" : [{"date" : json_key, "items" : json_value}]})
+			#email_json.update({"packages" : [{"date" : json_key, "items" : json_value}]})
+			email_json.setdefault('dates', []).append([{'date' : json_key}, {'items' : json_value}])
 	except:
 		print("Exception in generate_delivery_schedule_for_user()")
 
