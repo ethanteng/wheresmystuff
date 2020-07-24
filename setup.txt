@@ -2,6 +2,12 @@
 Local env
 =========
 
+### Switch to test APIs and URLs in:
+create_tracker.py
+email_helper.py
+template_helper.py
+
+
 ### Upload email templates to Mailgun
 ./setup_templates.py
 
@@ -22,6 +28,12 @@ nohup ./ngrok start --all --config="/home/ubuntu/.ngrok2/ngrok.yml" &
 ==============
 Production env
 ==============
+
+### Switch to production APIs and URLs in:
+create_tracker.py
+email_helper.py
+template_helper.py
+
 
 ### Upload email templates to Mailgun
 ./setup_templates.py
