@@ -94,7 +94,7 @@ def generate_delivery_schedule_for_user(user, user_packages):
 
 
 def send_email(user, email_json):
-	from_addr = "Support at WheresMyStuff<support@sandbox6441ed402cbe4179802eb8bf0af5d96d.mailgun.org>"
+	from_addr = "Support at WheresMyStuff <support@wheresmystuff.co>"
 	to_addr = str(user["email"])
 	bcc_addr = "ethanteng@gmail.com"
 	subject = "Your schedule of deliveries"

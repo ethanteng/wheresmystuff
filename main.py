@@ -84,7 +84,7 @@ def send_email(tracking_code, status, status_detail, est_delivery_date, carrier,
 	email = user[2]
 	
 	# Send email
-	from_addr = "Support at WheresMyStuff<support@sandbox6441ed402cbe4179802eb8bf0af5d96d.mailgun.org>"
+	from_addr = "Support at WheresMyStuff <support@wheresmystuff.co>"
 	to_addr = str(email)
 	bcc_addr = "ethanteng@gmail.com"
 	subject = "Update about your " + str(description)
