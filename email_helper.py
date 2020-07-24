@@ -5,7 +5,7 @@ import json
 
 def send_update_via_mailgun(from_addr, to_addr, bcc_addr, email_subject, email_json):
 
-	api_url = "https://api.mailgun.net/v3/sandbox6441ed402cbe4179802eb8bf0af5d96d.mailgun.org/messages"
+	api_url = "https://api.mailgun.net/v3/" + config.mailgun_url + "/messages"
 	api_key = config.mailgun_api_key
 	requests.post(api_url,
 			auth=("api",api_key),
