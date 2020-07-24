@@ -14,4 +14,4 @@ with open(filepath, mode='r') as csv_file:
 	for row in csv_reader:
 
 		user_id = create_user.create_user(row["first_name"], row["last_name"], row["email"])
-		create_package.create_package(user_id, row["tracking_code"], row["description"])
+		create_package.create_package(user_id, row["tracking_code"], row["carrier"], row["description"])

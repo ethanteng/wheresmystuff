@@ -3,7 +3,7 @@ import MySQLdb
 import config
 import create_tracker
 
-def create_package(user_id, tracking_code, description):
+def create_package(user_id, tracking_code, carrier, description):
 	# Setup MySQL Connection
 	db = MySQLdb.connect(host="localhost", user="root", passwd=config.db_password, db="wheresmystuff")
 	cursor = db.cursor()
@@ -19,8 +19,13 @@ def create_package(user_id, tracking_code, description):
 	if (num_results == 0):
 
 		# Create a new package
-		new_pkg_stmt = """INSERT INTO packages (user_id, tracking_code, description) VALUES (%s, %s, %s)"""
-		new_pkg_values = (user_id, tracking_code, description)
+		if (carrier is None):
+			new_pkg_stmt = """INSERT INTO packages (user_id, tracking_code, description) VALUES (%s, %s, %s)"""
+			new_pkg_values = (user_id, tracking_code, description)
+		else:
+			new_pkg_stmt = """INSERT INTO packages (user_id, tracking_code, carrier, description) VALUES (%s, %s, %s, %s)"""
+			new_pkg_values = (user_id, tracking_code, carrier, description)
+
 		cursor.execute(new_pkg_stmt, new_pkg_values)
 		pkg_id = cursor.lastrowid
 
@@ -33,4 +38,4 @@ def create_package(user_id, tracking_code, description):
 		db.commit()
 
 		# Create the EasyPost tracker object
-		create_tracker.create_tracker(tracking_code)
+		create_tracker.create_tracker(tracking_code, carrier)
