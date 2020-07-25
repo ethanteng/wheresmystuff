@@ -3,7 +3,6 @@ TripIt for package deliveries
 https://wheresmystuff.co/
 
 
-=========
 Local env
 =========
 
@@ -29,7 +28,6 @@ cd /home/ubuntu/Downloads
 nohup ./ngrok start --all --config="/home/ubuntu/.ngrok2/ngrok.yml" &
 
 
-==============
 Production env
 ==============
 
