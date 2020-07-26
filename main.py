@@ -115,6 +115,9 @@ def send_email(tracking_code, status, status_detail, est_delivery_date, carrier,
 	firstname = user[0]
 	lastname = user[1]
 	email = user[2]
+
+	# Formatting the delivery date to be more human-readable (with AM / PM)
+	est_delivery_date_ampm = est_delivery_date.strftime("%b %d %Y %-I:%M%p")
 	
 	# Send email
 	from_addr = "Support at WheresMyStuff <support@wheresmystuff.co>"
@@ -126,7 +129,7 @@ def send_email(tracking_code, status, status_detail, est_delivery_date, carrier,
 		"status_detail": str(status_detail),
 		"current_location": str(current_city) + " " + str(current_state) + " " + str(current_country),
 		"destination": str(destination),
-		"est_delivery_date": str(est_delivery_date),
+		"est_delivery_date": str(est_delivery_date_ampm),
 		"carrier": str(carrier),
 		"tracking_code": str(tracking_code)
 	}
