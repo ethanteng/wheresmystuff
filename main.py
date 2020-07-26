@@ -117,7 +117,7 @@ def send_email(tracking_code, status, status_detail, est_delivery_date, carrier,
 	email = user[2]
 
 	# Formatting the delivery date to be more human-readable (with AM / PM)
-	est_delivery_date_ampm = None;
+	est_delivery_date_ampm = None
 	if est_delivery_date is not None:
 		est_delivery_date_ampm = est_delivery_date.strftime("%b %d %Y %-I:%M%p")
 	

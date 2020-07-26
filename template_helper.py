@@ -4,7 +4,11 @@ import config
 
 
 def store_update_template():
-	api_url = "https://api.mailgun.net/v3/" + config.mailgun_test_url + "/templates"
+	api_url = None
+	if config.env == "test":
+		api_url = "https://api.mailgun.net/v3/" + config.mailgun_test_url + "/templates"
+	else:
+		api_url = "https://api.mailgun.net/v3/" + config.mailgun_prod_url + "/templates"
 	api_key = config.mailgun_api_key
 	
 	template_content = ""
@@ -20,7 +24,11 @@ def store_update_template():
 
 
 def store_schedule_template():
-	api_url = "https://api.mailgun.net/v3/" + config.mailgun_test_url + "/templates"
+	api_url = None
+	if config.env == "test":
+		api_url = "https://api.mailgun.net/v3/" + config.mailgun_test_url + "/templates"
+	else:
+		api_url = "https://api.mailgun.net/v3/" + config.mailgun_prod_url + "/templates"
 	api_key = config.mailgun_api_key
 	
 	template_content = ""
@@ -36,7 +44,11 @@ def store_schedule_template():
 
 
 def delete_update_template():
-	api_url = "https://api.mailgun.net/v3/" + config.mailgun_test_url + "/templates"
+	api_url = None
+	if config.env == "test":
+		api_url = "https://api.mailgun.net/v3/" + config.mailgun_test_url + "/templates"
+	else:
+		api_url = "https://api.mailgun.net/v3/" + config.mailgun_prod_url + "/templates"
 	api_key = config.mailgun_api_key
 	
 	requests.delete(api_url,
@@ -45,7 +57,11 @@ def delete_update_template():
 
 
 def delete_schedule_template():
-	api_url = "https://api.mailgun.net/v3/" + config.mailgun_test_url + "/templates"
+	api_url = None
+	if config.env == "test":
+		api_url = "https://api.mailgun.net/v3/" + config.mailgun_test_url + "/templates"
+	else:
+		api_url = "https://api.mailgun.net/v3/" + config.mailgun_prod_url + "/templates"
 	api_key = config.mailgun_api_key
 	
 	requests.delete(api_url,

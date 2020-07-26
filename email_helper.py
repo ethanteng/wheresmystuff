@@ -5,7 +5,12 @@ import json
 
 def send_update_via_mailgun(from_addr, to_addr, bcc_addr, email_subject, email_json):
 
-	api_url = "https://api.mailgun.net/v3/" + config.mailgun_test_url + "/messages"
+	api_url = None
+	if config.env == "test":
+		api_url = "https://api.mailgun.net/v3/" + config.mailgun_test_url + "/messages"
+	else:
+		api_url = "https://api.mailgun.net/v3/" + config.mailgun_prod_url + "/messages"
+
 	api_key = config.mailgun_api_key
 	requests.post(api_url,
 			auth=("api",api_key),
@@ -19,7 +24,12 @@ def send_update_via_mailgun(from_addr, to_addr, bcc_addr, email_subject, email_j
 
 def send_schedule_via_mailgun(from_addr, to_addr, bcc_addr, email_subject, email_json):
 	
-	api_url = "https://api.mailgun.net/v3/" + config.mailgun_test_url + "/messages"
+	api_url = None
+	if config.env == "test":
+		api_url = "https://api.mailgun.net/v3/" + config.mailgun_test_url + "/messages"
+	else:
+		api_url = "https://api.mailgun.net/v3/" + config.mailgun_prod_url + "/messages"
+
 	api_key = config.mailgun_api_key
 	requests.post(api_url,
 			auth=("api",api_key),

@@ -2,10 +2,8 @@
 Local env
 =========
 
-### Switch to test APIs and URLs in:
-create_tracker.py
-email_helper.py
-template_helper.py
+### Set env variable in config.py
+env = "test"
 
 
 ### Upload email templates to Mailgun
@@ -21,7 +19,7 @@ python3 -m flask run
 cp ngrok_test.yml /home/ubuntu/.ngrok2/ngrok.yml
 [add ngrok_auth_token to ngrok.yml]
 cd /home/ubuntu/Downloads
-nohup ./ngrok start --all --config="/home/ubuntu/.ngrok2/ngrok.yml" &
+./ngrok start --all --config="/home/ubuntu/.ngrok2/ngrok.yml"
 
 
 
@@ -29,10 +27,8 @@ nohup ./ngrok start --all --config="/home/ubuntu/.ngrok2/ngrok.yml" &
 Production env
 ==============
 
-### Switch to production APIs and URLs in:
-create_tracker.py
-email_helper.py
-template_helper.py
+### Set env variable in config.py
+env = "prod"
 
 
 ### Upload email templates to Mailgun

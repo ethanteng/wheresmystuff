@@ -2,8 +2,11 @@
 import easypost
 import config
 
-easypost.api_key = config.easypost_test_api_key
-#easypost.api_key = config.easypost_prod_api_key
+easypost.api_key = None
+if config.env == "test":
+	easypost.api_key = config.easypost_test_api_key
+else:
+	easypost.api_key = config.easypost_prod_api_key
 
 def create_tracker(tracking_code, carrier):
 
@@ -20,4 +23,4 @@ def create_tracker(tracking_code, carrier):
 				carrier=carrier
 			)
 	except:
-		print("Error while creating EasyPost tracker")
+		print("Error while creating EasyPost tracker for: " + str(tracking_code))
