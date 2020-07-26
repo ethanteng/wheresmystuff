@@ -51,3 +51,8 @@ Production env
 * [add ngrok_auth_token to ngrok.yml]
 * cd /home/ethanteng_gmail_com
 * nohup ./ngrok start --all --config="/home/ethanteng_gmail_com/.ngrok2/ngrok.yml" &
+
+
+### Set up cron job for daily schedule emails
+* crontab -e
+* 01 00 * * * /home/ethanteng_gmail_com/wheresmystuff/delivery_schedule.py
