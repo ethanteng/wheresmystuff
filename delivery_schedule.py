@@ -65,30 +65,27 @@ def generate_delivery_schedule_for_user(user, user_packages):
 	user_packages.sort()
 	email_json = {}
 
-	try:
-		for user_package in user_packages:
-			json_key = ""
-			fake_date = datetime.strptime("January 31, 2100", "%B %d, %Y")
-			if user_package[0] < fake_date:
-				delivery_date = user_package[0].strftime("%A %B %d, %Y")
-				json_key = "Arriving on " + delivery_date + ":"
-			else:
-				json_key = "Delivery unknown for:"
+	for user_package in user_packages:
+		json_key = ""
+		fake_date = datetime.strptime("January 31, 2100", "%B %d, %Y")
+		if user_package[0] < fake_date:
+			delivery_date = user_package[0].strftime("%A %B %d, %Y")
+			json_key = "Arriving on " + delivery_date + ":"
+		else:
+			json_key = "Delivery unknown for:"
 
 
-			json_value = ""
-			for i in range(1, len(user_package)):
-				description = str(user_package[i]["description"])
-				carrier = str(user_package[i]["carrier"])
-				tracking_code = str(user_package[i]["tracking_code"])
-				current_status = get_current_status(user_package[i])
-				current_location = get_current_location(user_package[i])
-				json_value = json_value + description + " (currently " + current_status + " at " + current_location + ")" + "<br>"
+		json_value = ""
+		for i in range(1, len(user_package)):
+			description = str(user_package[i]["description"])
+			carrier = str(user_package[i]["carrier"])
+			tracking_code = str(user_package[i]["tracking_code"])
+			current_status = get_current_status(user_package[i])
+			current_location = get_current_location(user_package[i])
+			json_value = json_value + description + " (currently " + current_status + " at " + current_location + ")" + "<br>"
 
-			#email_json.update({"packages" : [{"date" : json_key, "items" : json_value}]})
-			email_json.setdefault('dates', []).append([{'date' : json_key}, {'items' : json_value}])
-	except:
-		print("Exception in generate_delivery_schedule_for_user()")
+		#email_json.update({"packages" : [{"date" : json_key, "items" : json_value}]})
+		email_json.setdefault('dates', []).append([{'date' : json_key}, {'items' : json_value}])
 
 	send_email(user, email_json)
 
