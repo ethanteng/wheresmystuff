@@ -26,6 +26,7 @@ def respond():
 	current_city = None
 	current_state = None
 	current_country = None
+	public_url = None
 
 	if update["result"] is not None:
 		if update["result"]["tracking_code"] is not None:
@@ -41,6 +42,8 @@ def respond():
 				destination = update["result"]["carrier_detail"]["destination_location"]
 		if update["result"]["carrier"] is not None:
 			carrier = update["result"]["carrier"]
+		if update["result"]["public_url"] is not None:
+			public_url = update["result"]["public_url"]
 
 		# Formatting the delivery date to be more human-readable
 		if update["result"]["est_delivery_date"] is not None:
@@ -70,7 +73,7 @@ def respond():
 
 		update_tracker(tracking_code, tracker_id, status, est_delivery_date_obj, current_city, current_state, current_country, updated_at_date_obj)
 		#send_email(tracking_code, status, status_detail, est_delivery_date, carrier, origin, destination, current_city, current_state, current_country)
-		send_email(tracking_code, status, status_detail, est_delivery_date_obj, carrier, origin, destination, current_city, current_state, current_country)
+		send_email(tracking_code, status, status_detail, est_delivery_date_obj, carrier, origin, destination, current_city, current_state, current_country, public_url)
 		
 		return Response(status=200)
 	else:
@@ -96,7 +99,7 @@ def update_tracker(tracking_code, tracker_id, status, est_delivery_date, current
 	db.commit()
 
 
-def send_email(tracking_code, status, status_detail, est_delivery_date, carrier, origin, destination, current_city, current_state, current_country):
+def send_email(tracking_code, status, status_detail, est_delivery_date, carrier, origin, destination, current_city, current_state, current_country, public_url):
 	# Setup MySQL Connection
 	db = MySQLdb.connect(host="localhost", user="root", passwd=config.db_password, db="wheresmystuff")
 	cursor = db.cursor()
@@ -125,14 +128,40 @@ def send_email(tracking_code, status, status_detail, est_delivery_date, carrier,
 	from_addr = "Support at WheresMyStuff <support@wheresmystuff.co>"
 	to_addr = str(email)
 	bcc_addr = "ethanteng@gmail.com"
-	subject = "Update about your " + str(description)
+	if description is not None:
+		subject = "Update about your " + str(description)
+	else:
+		subject = "Update about your package " + str(tracking_code)
+	if status is None:
+		status = "unknown"
+	if status_detail is None:
+		status_detail = "no further details available"
+	if ((current_city is None) and (current_state is None) and (current_country is None)):
+		current_location = "unknown"
+	else:
+		if current_city is None:
+			current_city = ""
+		if current_state is None:
+			current_state = ""
+		if current_country is None:
+			current_country = ""
+		current_location = current_city + " " + current_state + " " + current_country
+	if destination is None:
+		destination = ""
+	if est_delivery_date_ampm is None:
+		est_delivery_date_ampm = "none available"
+	if carrier is None:
+		carrier = ""
+	if public_url is None:
+		public_url = ""
 	email_json = {
 		"status": str(status),
 		"status_detail": str(status_detail),
-		"current_location": str(current_city) + " " + str(current_state) + " " + str(current_country),
+		"current_location": current_location,
 		"destination": str(destination),
 		"est_delivery_date": str(est_delivery_date_ampm),
 		"carrier": str(carrier),
-		"tracking_code": str(tracking_code)
+		"tracking_code": str(tracking_code),
+		"public_url" : str(public_url)
 	}
 	email_helper.send_update_via_mailgun(from_addr, to_addr, bcc_addr, subject, email_json)

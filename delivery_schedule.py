@@ -28,21 +28,30 @@ def get_packages_for_user(user_id):
 		tracker = cursor.fetchone()
 		if tracker["status"] != "delivered": # Skip packages that have already been delivered
 			
-			if tracker["status"] in ("unknown","pre_transit","in_transit","out_for_delivery","available_for_pickup"):
-				index = get_index_of_date(user_packages, tracker["est_delivery_date"])
+			if tracker["est_delivery_date"] is not None:
+				if tracker["status"] in ("unknown","pre_transit","in_transit","out_for_delivery","available_for_pickup"):
+					index = get_index_of_date(user_packages, tracker["est_delivery_date"])
 
-				if index == -1:
-					user_packages.append([tracker["est_delivery_date"], package])
-				else:
-					user_packages[index].append(package)
-			else: # return_to_sender, failure, cancelled, error
+					if index == -1:
+						user_packages.append([tracker["est_delivery_date"], package])
+					else:
+						user_packages[index].append(package)
+				else: # return_to_sender, failure, cancelled, error
+					fake_date = datetime.strptime("January 31, 2100", "%B %d, %Y")
+					index = get_index_of_date(user_packages, fake_date)
+
+					if index == -1:
+						user_packages.append([fake_date, package])
+					else:
+						user_packages[index].append(package)
+			else:
 				fake_date = datetime.strptime("January 31, 2100", "%B %d, %Y")
 				index = get_index_of_date(user_packages, fake_date)
 
 				if index == -1:
 					user_packages.append([fake_date, package])
 				else:
-					user_packages[index].append(package)
+					user_packages[index].append(package)		
 
 	return(user_packages)
 
@@ -72,16 +81,27 @@ def generate_delivery_schedule_for_user(user, user_packages):
 			delivery_date = user_package[0].strftime("%A %B %d, %Y")
 			json_key = "Arriving on " + delivery_date + ":"
 		else:
-			json_key = "Delivery unknown for:"
+			json_key = "Delivery date unknown for:"
 
 
 		json_value = ""
 		for i in range(1, len(user_package)):
-			description = str(user_package[i]["description"])
-			carrier = str(user_package[i]["carrier"])
-			tracking_code = str(user_package[i]["tracking_code"])
+			description = None
+			current_status = None
+			current_location = None
+
+			if user_package[i]["description"] is not None:
+				description = str(user_package[i]["description"])
+			else:
+				description = str(user_package[i]["tracking_code"])
+
 			current_status = get_current_status(user_package[i])
+			if current_status is None:
+				current_status = "unknown status"
 			current_location = get_current_location(user_package[i])
+			if current_location is None:
+				current_location = "unknown location"
+
 			json_value = json_value + description + " (currently " + current_status + " at " + current_location + ")" + "<br>"
 
 		#email_json.update({"packages" : [{"date" : json_key, "items" : json_value}]})
@@ -121,7 +141,20 @@ def get_current_location(package):
 	cursor.execute(query, parameters)
 	tracker = cursor.fetchone()
 
-	location = str(tracker["current_city"]) + " " + str(tracker["current_state"])
+	if ((tracker["current_city"] is not None) and (tracker["current_city"] is not None) and (tracker["current_country"] is not None)):
+		city = ""
+		state = ""
+		country = ""
+		if tracker["current_city"] is not None:
+			city = tracker["current_city"]
+		if tracker["current_state"] is not None:
+			state = tracker["current_state"]
+		if tracker["current_country"] is not None:
+			country = tracker["current_country"]
+		location = city + " " + state + " " + country
+	else:
+		location = "unknown location"
+	
 	return(location)
 
 
