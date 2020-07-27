@@ -6,10 +6,8 @@ https://wheresmystuff.co/
 Local env
 =========
 
-### Switch to test APIs and URLs in:
-* create_tracker.py
-* email_helper.py
-* template_helper.py
+### Set env variable in config.py
+env = "test"
 
 
 ### Upload email templates to Mailgun
@@ -31,10 +29,8 @@ Local env
 Production env
 ==============
 
-### Switch to production APIs and URLs in:
-* create_tracker.py
-* email_helper.py
-* template_helper.py
+### Set env variable in config.py
+env = "prod"
 
 
 ### Upload email templates to Mailgun
