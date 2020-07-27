@@ -14,70 +14,73 @@ app = Flask(__name__)
 def respond():
 	update = request.json
 
-	tracking_code = None
-	tracker_id = None
-	status = None
-	origin = None
-	destination = None
-	carrier = None
-	est_delivery_date_obj = None
-	updated_at_date_obj = None
-	status_detail = None
-	current_city = None
-	current_state = None
-	current_country = None
-	public_url = None
+	if update["description"] == "tracker.created":
+		tracking_code = None
+		tracker_id = None
+		status = None
+		origin = None
+		destination = None
+		carrier = None
+		est_delivery_date_obj = None
+		updated_at_date_obj = None
+		status_detail = None
+		current_city = None
+		current_state = None
+		current_country = None
+		public_url = None
 
-	if update["result"] is not None:
-		if update["result"]["tracking_code"] is not None:
-			tracking_code = update["result"]["tracking_code"]
-		if update["result"]["id"] is not None:
-			tracker_id = update["result"]["id"]
-		if update["result"]["status"] is not None:
-			status = update["result"]["status"]
-		if update["result"]["carrier_detail"] is not None:
-			if update["result"]["carrier_detail"]["origin_location"] is not None:
-				origin = update["result"]["carrier_detail"]["origin_location"]
-			if update["result"]["carrier_detail"]["destination_location"] is not None:
-				destination = update["result"]["carrier_detail"]["destination_location"]
-		if update["result"]["carrier"] is not None:
-			carrier = update["result"]["carrier"]
-		if update["result"]["public_url"] is not None:
-			public_url = update["result"]["public_url"]
+		if update["result"] is not None:
+			if update["result"]["tracking_code"] is not None:
+				tracking_code = update["result"]["tracking_code"]
+			if update["result"]["id"] is not None:
+				tracker_id = update["result"]["id"]
+			if update["result"]["status"] is not None:
+				status = update["result"]["status"]
+			if update["result"]["carrier_detail"] is not None:
+				if update["result"]["carrier_detail"]["origin_location"] is not None:
+					origin = update["result"]["carrier_detail"]["origin_location"]
+				if update["result"]["carrier_detail"]["destination_location"] is not None:
+					destination = update["result"]["carrier_detail"]["destination_location"]
+			if update["result"]["carrier"] is not None:
+				carrier = update["result"]["carrier"]
+			if update["result"]["public_url"] is not None:
+				public_url = update["result"]["public_url"]
 
-		# Formatting the delivery date to be more human-readable
-		if update["result"]["est_delivery_date"] is not None:
-			est_delivery_date_str = str(update["result"]["est_delivery_date"])
-			est_delivery_date_obj = datetime.strptime(est_delivery_date_str, "%Y-%m-%dT%H:%M:%SZ")
-			#est_delivery_date = est_delivery_date_obj.strftime("%b %d %Y %-I:%M%p")
+			# Formatting the delivery date to be more human-readable
+			if update["result"]["est_delivery_date"] is not None:
+				est_delivery_date_str = str(update["result"]["est_delivery_date"])
+				est_delivery_date_obj = datetime.strptime(est_delivery_date_str, "%Y-%m-%dT%H:%M:%SZ")
+				#est_delivery_date = est_delivery_date_obj.strftime("%b %d %Y %-I:%M%p")
 
-		# Formatting the updated at date to be more human readable
-		if update["result"]["updated_at"] is not None:
-			updated_at_date_str = str(update["result"]["updated_at"])
-			updated_at_date_obj = datetime.strptime(updated_at_date_str, "%Y-%m-%dT%H:%M:%SZ")
+			# Formatting the updated at date to be more human readable
+			if update["result"]["updated_at"] is not None:
+				updated_at_date_str = str(update["result"]["updated_at"])
+				updated_at_date_obj = datetime.strptime(updated_at_date_str, "%Y-%m-%dT%H:%M:%SZ")
 
-		# Get the most recent tracking details
-		if update["result"]["tracking_details"] is not None:
-			tracking_details = update["result"]["tracking_details"]
-			num_tracking_details = len(tracking_details)
-			most_recent_detail = update["result"]["tracking_details"][num_tracking_details-1]
-			status_detail = most_recent_detail["message"]
-			current_city = most_recent_detail["tracking_location"]["city"]
-			current_state = most_recent_detail["tracking_location"]["state"]
-			current_country = most_recent_detail["tracking_location"]["country"]
+			# Get the most recent tracking details
+			if update["result"]["tracking_details"] is not None:
+				tracking_details = update["result"]["tracking_details"]
+				num_tracking_details = len(tracking_details)
+				most_recent_detail = update["result"]["tracking_details"][num_tracking_details-1]
+				status_detail = most_recent_detail["message"]
+				current_city = most_recent_detail["tracking_location"]["city"]
+				current_state = most_recent_detail["tracking_location"]["state"]
+				current_country = most_recent_detail["tracking_location"]["country"]
+			else:
+				status_detail = None
+				current_city = None
+				current_state = None
+				current_country = None
+
+			update_tracker(tracking_code, tracker_id, status, est_delivery_date_obj, current_city, current_state, current_country, updated_at_date_obj)
+			#send_email(tracking_code, status, status_detail, est_delivery_date, carrier, origin, destination, current_city, current_state, current_country)
+			send_email(tracking_code, status, status_detail, est_delivery_date_obj, carrier, origin, destination, current_city, current_state, current_country, public_url)
+			
+			return Response(status=200)
 		else:
-			status_detail = None
-			current_city = None
-			current_state = None
-			current_country = None
-
-		update_tracker(tracking_code, tracker_id, status, est_delivery_date_obj, current_city, current_state, current_country, updated_at_date_obj)
-		#send_email(tracking_code, status, status_detail, est_delivery_date, carrier, origin, destination, current_city, current_state, current_country)
-		send_email(tracking_code, status, status_detail, est_delivery_date_obj, carrier, origin, destination, current_city, current_state, current_country, public_url)
-		
-		return Response(status=200)
+			return Response(status=500)
 	else:
-		return Response(status=500)
+		return Response(status=200)
 
 
 def update_tracker(tracking_code, tracker_id, status, est_delivery_date, current_city, current_state, current_country, updated_at_date):

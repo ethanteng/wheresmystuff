@@ -102,7 +102,7 @@ def generate_delivery_schedule_for_user(user, user_packages):
 			if current_location is None:
 				current_location = "unknown location"
 
-			json_value = json_value + description + " (currently " + current_status + " at " + current_location + ")" + "<br>"
+			json_value = json_value + "<li>" + description + " (currently " + current_status + " at " + current_location + ")" + "</li>"
 
 		#email_json.update({"packages" : [{"date" : json_key, "items" : json_value}]})
 		email_json.setdefault('dates', []).append([{'date' : json_key}, {'items' : json_value}])
@@ -114,7 +114,7 @@ def send_email(user, email_json):
 	from_addr = "Support at WheresMyStuff <support@wheresmystuff.co>"
 	to_addr = str(user["email"])
 	bcc_addr = "ethanteng@gmail.com"
-	subject = "Your schedule of deliveries"
+	subject = "Your delivery schedule"
 	email_helper.send_schedule_via_mailgun(from_addr, to_addr, bcc_addr, subject, email_json)
 
 
