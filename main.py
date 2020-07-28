@@ -14,7 +14,7 @@ app = Flask(__name__)
 def respond():
 	update = request.json
 
-	if update["description"] == "tracker.created":
+	if update["description"] != "tracker.created":
 		tracking_code = None
 		tracker_id = None
 		status = None
