@@ -7,7 +7,7 @@ Local env
 =========
 
 ### Set env variable in config.py
-env = "test"
+* env = "test"
 
 
 ### Upload email templates to Mailgun
@@ -30,7 +30,7 @@ Production env
 ==============
 
 ### Set env variable in config.py
-env = "prod"
+* env = "prod"
 
 
 ### Upload email templates to Mailgun
