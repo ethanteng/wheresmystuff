@@ -13,5 +13,24 @@ with open(filepath, mode='r') as csv_file:
 	csv_reader = csv.DictReader(csv_file)
 	for row in csv_reader:
 
-		user_id = create_user.create_user(row["first_name"], row["last_name"], row["email"])
-		create_package.create_package(user_id, row["tracking_code"], row["carrier"], row["description"])
+		first_name = row["first_name"]
+		if first_name == "":
+			first_name = None
+		last_name = row["last_name"]
+		if last_name == "":
+			last_name = None
+		email = row["email"]
+		if email == "":
+			email = None
+		tracking_code = row["tracking_code"]
+		if tracking_code == "":
+			tracking_code = None
+		carrier = row["carrier"]
+		if carrier == "":
+			carrier = None
+		description = row["description"]
+		if description == "":
+			description = None
+
+		user_id = create_user.create_user(first_name, last_name, email)
+		create_package.create_package(user_id, tracking_code, carrier, description)

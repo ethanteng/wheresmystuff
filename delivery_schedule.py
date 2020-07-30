@@ -141,7 +141,9 @@ def get_current_location(package):
 	cursor.execute(query, parameters)
 	tracker = cursor.fetchone()
 
-	if ((tracker["current_city"] is not None) and (tracker["current_city"] is not None) and (tracker["current_country"] is not None)):
+	if ((tracker["current_city"] is None) and (tracker["current_city"] is None) and (tracker["current_country"] is None)):
+		location = "unknown location"
+	else:
 		city = ""
 		state = ""
 		country = ""
@@ -152,8 +154,6 @@ def get_current_location(package):
 		if tracker["current_country"] is not None:
 			country = tracker["current_country"]
 		location = city + " " + state + " " + country
-	else:
-		location = "unknown location"
 	
 	return(location)
 
