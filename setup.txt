@@ -47,6 +47,7 @@ cd /home/ethanteng_gmail_com
 nohup ./ngrok start --all --config="/home/ethanteng_gmail_com/.ngrok2/ngrok.yml" &
 
 
-### Set up cron job for daily schedule emails
+### Set up cron job for daily schedule emails & checking status of Amazon-fulfilled packages
 crontab -e
 01 00 * * * /home/ethanteng_gmail_com/wheresmystuff/delivery_schedule.py
+* */1 * * * /home/ethanteng_gmail_com/wheresmystuff/check_amazon_status.py
