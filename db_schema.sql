@@ -29,3 +29,13 @@ CREATE TABLE trackers (
   current_country VARCHAR(50),
   updated_at DATETIME
 );
+
+
+
+CREATE TABLE amazon_delivery (
+  id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  package_id INT(6) UNSIGNED NOT NULL,
+  tracking_url VARCHAR(500) UNIQUE,
+  status VARCHAR(200),
+  updated_at DATETIME
+);

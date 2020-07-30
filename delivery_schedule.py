@@ -5,6 +5,7 @@ import requests
 import datetime
 from datetime import datetime
 import email_helper
+from check_amazon import check_amazon
 
 
 def get_packages_for_user(user_id):
@@ -20,23 +21,33 @@ def get_packages_for_user(user_id):
 	packages = cursor.fetchall()
 	for package in packages:
 
+		tracking_code = package["tracking_code"]
 		package_id = package["id"]
-		get_trackers_query = """SELECT * FROM trackers WHERE package_id = %s"""
-		get_trackers_parameters = [package_id]
+		if not check_amazon(tracking_code):
+			get_trackers_query = """SELECT * FROM trackers WHERE package_id = %s"""
+			get_trackers_parameters = [package_id]
 
-		cursor.execute(get_trackers_query, get_trackers_parameters)
-		tracker = cursor.fetchone()
-		if tracker["status"] != "delivered": # Skip packages that have already been delivered
-			
-			if tracker["est_delivery_date"] is not None:
-				if tracker["status"] in ("unknown","pre_transit","in_transit","out_for_delivery","available_for_pickup"):
-					index = get_index_of_date(user_packages, tracker["est_delivery_date"])
+			cursor.execute(get_trackers_query, get_trackers_parameters)
+			tracker = cursor.fetchone()
+			if tracker["status"] != "delivered": # Skip packages that have already been delivered
+				
+				if tracker["est_delivery_date"] is not None:
+					if tracker["status"] in ("unknown","pre_transit","in_transit","out_for_delivery","available_for_pickup"):
+						index = get_index_of_date(user_packages, tracker["est_delivery_date"])
 
-					if index == -1:
-						user_packages.append([tracker["est_delivery_date"], package])
-					else:
-						user_packages[index].append(package)
-				else: # return_to_sender, failure, cancelled, error
+						if index == -1:
+							user_packages.append([tracker["est_delivery_date"], package])
+						else:
+							user_packages[index].append(package)
+					else: # return_to_sender, failure, cancelled, error
+						fake_date = datetime.strptime("January 31, 2100", "%B %d, %Y")
+						index = get_index_of_date(user_packages, fake_date)
+
+						if index == -1:
+							user_packages.append([fake_date, package])
+						else:
+							user_packages[index].append(package)
+				else:
 					fake_date = datetime.strptime("January 31, 2100", "%B %d, %Y")
 					index = get_index_of_date(user_packages, fake_date)
 
@@ -44,14 +55,20 @@ def get_packages_for_user(user_id):
 						user_packages.append([fake_date, package])
 					else:
 						user_packages[index].append(package)
-			else:
-				fake_date = datetime.strptime("January 31, 2100", "%B %d, %Y")
-				index = get_index_of_date(user_packages, fake_date)
+		else:
+			get_trackers_query = """SELECT * FROM amazon_delivery WHERE package_id = %s"""
+			get_trackers_parameters = [package_id]
+
+			cursor.execute(get_trackers_query, get_trackers_parameters)
+			tracker = cursor.fetchone()
+			if tracker["status"].find("Delivered") == -1: # Skip packages that have already been delivered
+				fake_date_amazon = datetime.strptime("January 31, 2200", "%B %d, %Y")
+				index = get_index_of_date(user_packages, fake_date_amazon)
 
 				if index == -1:
-					user_packages.append([fake_date, package])
+					user_packages.append([fake_date_amazon, package])
 				else:
-					user_packages[index].append(package)		
+					user_packages[index].append(package)
 
 	return(user_packages)
 
@@ -77,11 +94,14 @@ def generate_delivery_schedule_for_user(user, user_packages):
 	for user_package in user_packages:
 		json_key = ""
 		fake_date = datetime.strptime("January 31, 2100", "%B %d, %Y")
+		fake_date_amazon = datetime.strptime("January 31, 2200", "%B %d, %Y")
 		if user_package[0] < fake_date:
 			delivery_date = user_package[0].strftime("%A %B %d, %Y")
 			json_key = "Arriving on " + delivery_date + ":"
-		else:
+		elif user_package[0] < fake_date_amazon:
 			json_key = "Delivery date unknown for:"
+		else:
+			json_key = "Deliveries by Amazon couriers:"
 
 
 		json_value = ""
@@ -123,10 +143,16 @@ def get_current_status(package):
 	db = MySQLdb.connect(host="localhost", user="root", passwd=config.db_password, db="wheresmystuff")
 	cursor = db.cursor(MySQLdb.cursors.DictCursor)
 
-	query = """SELECT * FROM trackers WHERE package_id = %s"""
-	parameters = [package["id"]]
-	cursor.execute(query, parameters)
-	tracker = cursor.fetchone()
+	if not check_amazon(package["tracking_code"]):
+		query = """SELECT * FROM trackers WHERE package_id = %s"""
+		parameters = [package["id"]]
+		cursor.execute(query, parameters)
+		tracker = cursor.fetchone()
+	else:
+		query = """SELECT * FROM amazon_delivery WHERE package_id = %s"""
+		parameters = [package["id"]]
+		cursor.execute(query, parameters)
+		tracker = cursor.fetchone()
 
 	return(str(tracker["status"]))
 
@@ -136,24 +162,27 @@ def get_current_location(package):
 	db = MySQLdb.connect(host="localhost", user="root", passwd=config.db_password, db="wheresmystuff")
 	cursor = db.cursor(MySQLdb.cursors.DictCursor)
 
-	query = """SELECT * FROM trackers WHERE package_id = %s"""
-	parameters = [package["id"]]
-	cursor.execute(query, parameters)
-	tracker = cursor.fetchone()
+	if not check_amazon(package["tracking_code"]):
+		query = """SELECT * FROM trackers WHERE package_id = %s"""
+		parameters = [package["id"]]
+		cursor.execute(query, parameters)
+		tracker = cursor.fetchone()
 
-	if ((tracker["current_city"] is None) and (tracker["current_city"] is None) and (tracker["current_country"] is None)):
-		location = "unknown location"
+		if ((tracker["current_city"] is None) and (tracker["current_city"] is None) and (tracker["current_country"] is None)):
+			location = "unknown location"
+		else:
+			city = ""
+			state = ""
+			country = ""
+			if tracker["current_city"] is not None:
+				city = tracker["current_city"]
+			if tracker["current_state"] is not None:
+				state = tracker["current_state"]
+			if tracker["current_country"] is not None:
+				country = tracker["current_country"]
+			location = city + " " + state + " " + country
 	else:
-		city = ""
-		state = ""
-		country = ""
-		if tracker["current_city"] is not None:
-			city = tracker["current_city"]
-		if tracker["current_state"] is not None:
-			state = tracker["current_state"]
-		if tracker["current_country"] is not None:
-			country = tracker["current_country"]
-		location = city + " " + state + " " + country
+		location = "Amazon location"
 	
 	return(location)
 

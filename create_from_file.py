@@ -31,6 +31,9 @@ with open(filepath, mode='r') as csv_file:
 		description = row["description"]
 		if description == "":
 			description = None
+		amazon_url = row["amazon_url"]
+		if amazon_url == "":
+			amazon_url = None
 
 		user_id = create_user.create_user(first_name, last_name, email)
-		create_package.create_package(user_id, tracking_code, carrier, description)
+		create_package.create_package(user_id, tracking_code, carrier, description, amazon_url)

@@ -2,8 +2,9 @@
 import MySQLdb
 import config
 import create_tracker
+import check_amazon
 
-def create_package(user_id, tracking_code, carrier, description):
+def create_package(user_id, tracking_code, carrier, description, amazon_url):
 	# Setup MySQL Connection
 	db = MySQLdb.connect(host="localhost", user="root", passwd=config.db_password, db="wheresmystuff")
 	cursor = db.cursor()
@@ -17,7 +18,7 @@ def create_package(user_id, tracking_code, carrier, description):
 
 	# If the tracking code doesn't already exist for the user
 	if (num_results == 0):
-
+		
 		# Create a new package
 		if (carrier is None):
 			new_pkg_stmt = """INSERT INTO packages (user_id, tracking_code, description) VALUES (%s, %s, %s)"""
@@ -29,13 +30,22 @@ def create_package(user_id, tracking_code, carrier, description):
 		cursor.execute(new_pkg_stmt, new_pkg_values)
 		pkg_id = cursor.lastrowid
 
-		# Create the associated tracker db entry
-		query = "INSERT INTO trackers (package_id) VALUES (%s)"
-		value = [pkg_id]
-		cursor.execute(query, value)
+		if not check_amazon.check_amazon(tracking_code):
 
-		# Save changes to database
-		db.commit()
+			# Create the associated tracker db entry
+			query = "INSERT INTO trackers (package_id) VALUES (%s)"
+			value = [pkg_id]
+			cursor.execute(query, value)
 
-		# Create the EasyPost tracker object
-		create_tracker.create_tracker(tracking_code, carrier)
+			# Save changes to database
+			db.commit()
+
+			# Create the EasyPost tracker object
+			create_tracker.create_tracker(tracking_code, carrier)
+		else:
+
+			query = "INSERT INTO amazon_delivery (package_id, tracking_url) VALUES (%s, %s)"
+			values = (pkg_id, amazon_url)
+			cursor.execute(query, values)
+
+			db.commit()
