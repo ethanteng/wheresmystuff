@@ -132,7 +132,7 @@ def send_email(tracking_code, status, status_detail, est_delivery_date, carrier,
 	to_addr = str(email)
 	bcc_addr = "ethanteng@gmail.com"
 	if description is not None:
-		subject = "Update about your " + str(description)
+		subject = "Update about your " + str(description) + " (" + str(tracking_code) + ")"
 	else:
 		subject = "Update about your package " + str(tracking_code)
 	if status is None:

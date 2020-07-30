@@ -91,9 +91,9 @@ def generate_delivery_schedule_for_user(user, user_packages):
 			current_location = None
 
 			if user_package[i]["description"] is not None:
-				description = str(user_package[i]["description"])
+				description = str(user_package[i]["description"]) + " (" + str(user_package[i]["tracking_code"]) + "):"
 			else:
-				description = str(user_package[i]["tracking_code"])
+				description = str(user_package[i]["tracking_code"]) + ":"
 
 			current_status = get_current_status(user_package[i])
 			if current_status is None:
@@ -102,7 +102,7 @@ def generate_delivery_schedule_for_user(user, user_packages):
 			if current_location is None:
 				current_location = "unknown location"
 
-			json_value = json_value + "<li>" + description + " (currently " + current_status + " at " + current_location + ")" + "</li>"
+			json_value = json_value + "<li>" + description + " currently " + current_status + " at " + current_location + "</li>"
 
 		#email_json.update({"packages" : [{"date" : json_key, "items" : json_value}]})
 		email_json.setdefault('dates', []).append([{'date' : json_key}, {'items' : json_value}])
