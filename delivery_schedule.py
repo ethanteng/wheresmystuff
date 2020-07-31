@@ -134,7 +134,8 @@ def send_email(user, email_json):
 	from_addr = "Support at WheresMyStuff <support@wheresmystuff.co>"
 	to_addr = str(user["email"])
 	bcc_addr = "ethanteng@gmail.com"
-	subject = "Your delivery schedule"
+	today = datetime.now().strftime("%b %-d")
+	subject = str(today) + ": your updated delivery schedule"
 	email_helper.send_schedule_via_mailgun(from_addr, to_addr, bcc_addr, subject, email_json)
 
 
