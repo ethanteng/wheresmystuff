@@ -5,6 +5,7 @@ import lxml
 import MySQLdb
 import config
 import datetime
+import send_email_helper
 
 
 def get_status(url):
@@ -19,7 +20,7 @@ def get_status(url):
 db = MySQLdb.connect(host="localhost", user="root", passwd=config.db_password, db="wheresmystuff")
 cursor = db.cursor(MySQLdb.cursors.DictCursor)
 
-query = """SELECT * FROM amazon_delivery"""
+query = """SELECT * FROM amazon_delivery INNER JOIN packages ON amazon_delivery.package_id = packages.id"""
 cursor.execute(query)
 deliveries = cursor.fetchall()
 
@@ -27,10 +28,32 @@ for delivery in deliveries:
 
 	pkg_id = delivery["package_id"]
 	url = delivery["tracking_url"]
-	status = get_status(url)
+	old_status = delivery["status"]
+	new_status = get_status(url)
 
-	update = """UPDATE amazon_delivery SET status = %s, updated_at = %s where package_id = %s"""
-	updated_at = datetime.datetime.now()
-	values = (status, updated_at, pkg_id)
-	cursor.execute(update, values)
-	db.commit()
+	if (old_status != new_status):
+		update = """UPDATE amazon_delivery SET status = %s, updated_at = %s where package_id = %s"""
+		updated_at = datetime.datetime.now()
+		values = (new_status, updated_at, pkg_id)
+		cursor.execute(update, values)
+		db.commit()
+
+		# Send update email
+		tracking_code = None
+		tracker_id = None
+		status = None
+		origin = None
+		destination = None
+		carrier = None
+		est_delivery_date_obj = None
+		status_detail = None
+		current_city = None
+		current_state = None
+		current_country = None
+		public_url = None
+
+		tracking_code = delivery["tracking_code"]
+		status = new_status
+		public_url = url
+
+		send_email_helper.send_email(tracking_code, status, status_detail, est_delivery_date_obj, carrier, origin, destination, current_city, current_state, current_country, public_url)
