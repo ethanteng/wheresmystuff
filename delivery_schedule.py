@@ -4,6 +4,7 @@ import config
 import requests
 import datetime
 from datetime import datetime
+from dateutil import tz
 import email_helper
 from check_amazon import check_amazon
 
@@ -135,7 +136,8 @@ def send_email(user, email_json):
 	from_addr = "Support at WheresMyStuff <support@wheresmystuff.co>"
 	to_addr = str(user["email"])
 	bcc_addr = "ethanteng@gmail.com"
-	today = datetime.now().strftime("%b %-d")
+	PST_tz = tz.gettz("America/Los_Angeles")
+	today = datetime.now(tz=PST_tz).strftime("%b %-d")
 	subject = str(today) + ": your updated delivery schedule"
 	email_helper.send_schedule_via_mailgun(from_addr, to_addr, bcc_addr, subject, email_json)
 

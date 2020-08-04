@@ -16,10 +16,11 @@ def create_package(user_id, tracking_code, carrier, description, amazon_url):
 	results = cursor.fetchone()
 	num_results = results[0]
 
+	created_new_pkg = False
 	# If the tracking code doesn't already exist for the user
 	if (num_results == 0):
-		
-		# Create a new package
+
+		# Create a new package		
 		if (carrier is None):
 			new_pkg_stmt = """INSERT INTO packages (user_id, tracking_code, description) VALUES (%s, %s, %s)"""
 			new_pkg_values = (user_id, tracking_code, description)
@@ -29,6 +30,7 @@ def create_package(user_id, tracking_code, carrier, description, amazon_url):
 
 		cursor.execute(new_pkg_stmt, new_pkg_values)
 		pkg_id = cursor.lastrowid
+		created_new_pkg = True
 
 		if not check_amazon.check_amazon(tracking_code):
 
@@ -49,3 +51,5 @@ def create_package(user_id, tracking_code, carrier, description, amazon_url):
 			cursor.execute(query, values)
 
 			db.commit()
+
+	return(created_new_pkg)

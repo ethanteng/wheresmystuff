@@ -4,6 +4,7 @@ import os
 import csv
 import create_user
 import create_package
+import email_helper
 
 filepath = sys.argv[1]
 if not os.path.isfile(filepath):
@@ -36,4 +37,7 @@ with open(filepath, mode='r') as csv_file:
 			amazon_url = None
 
 		user_id = create_user.create_user(first_name, last_name, email)
-		create_package.create_package(user_id, tracking_code, carrier, description, amazon_url)
+		created_new_package = create_package.create_package(user_id, tracking_code, carrier, description, amazon_url)
+		
+		if (created_new_package):
+			email_helper.send_ack_via_mailgun(email, tracking_code, description)
