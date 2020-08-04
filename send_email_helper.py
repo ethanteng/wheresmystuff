@@ -3,6 +3,7 @@ import email_helper
 import datetime
 import MySQLdb
 import config
+import check_amazon
 
 def send_email(tracking_code, status, status_detail, est_delivery_date, carrier, origin, destination, current_city, current_state, current_country, public_url):
 	# Setup MySQL Connection
@@ -26,8 +27,11 @@ def send_email(tracking_code, status, status_detail, est_delivery_date, carrier,
 
 	# Formatting the delivery date to be more human-readable (with AM / PM)
 	est_delivery_date_ampm = None
-	if est_delivery_date is not None:
-		est_delivery_date_ampm = est_delivery_date.strftime("%b %d %Y %-I:%M%p")
+	if check_amazon.check_amazon(tracking_code):	
+		est_delivery_date_ampm = status
+	else:
+		if est_delivery_date is not None:
+			est_delivery_date_ampm = est_delivery_date.strftime("%b %d %Y %-I:%M%p")
 	
 	# Send email
 	from_addr = "Support at WheresMyStuff <support@wheresmystuff.co>"
