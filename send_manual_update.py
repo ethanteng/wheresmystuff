@@ -1,10 +1,12 @@
 #!/usr/bin/python3
+import datetime
+import send_email_helper
 
 
 # Manually entered values
 tracking_code = "783361"
-status = "delayed - will call to schedule delivery"
-status_detail = "waiting for another item to arrive (Latta Beach Sand Dining Table for 8)"
+status = "City Business will call to schedule delivery by the end of this week"
+status_detail = "last item is on its way to the warehouse (Latta Beach Sand Dining Table for 8)"
 est_delivery_date = datetime.date(2020, 8, 13)
 carrier = "City Business 415-900-9118"
 origin = None
