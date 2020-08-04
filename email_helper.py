@@ -50,7 +50,7 @@ def send_ack_via_mailgun(email, tracking_code, description):
 		email_subject = "WheresMyStuff is now tracking your " + str(description) + " (" + str(tracking_code) + ")"
 	else:
 		email_subject = "WheresMyStuff is now tracking your package " + str(tracking_code)
-	email_body = "Thanks for using WheresMyStuff! You'll start getting updates about this package (" + str(tracking_code) + ") from support@wheresmystuff.co."
+	email_body = "Thanks for using WheresMyStuff! You will now start getting emails from support@wheresmystuff.co with updates about this package (" + str(tracking_code) + ")."
 
 	api_url = None
 	if config.env == "test":
