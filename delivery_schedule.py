@@ -33,7 +33,7 @@ def get_packages_for_user(user_id):
 			if tracker["status"] != "delivered": # Skip packages that have already been delivered
 				
 				if tracker["est_delivery_date"] is not None:
-					if tracker["status"] in ("unknown","pre_transit","in_transit","out_for_delivery","available_for_pickup"):
+					if tracker["status"] in ("unknown","pre_transit","in_transit","out_for_delivery","available_for_pickup","delayed"):
 						index = get_index_of_date(user_packages, tracker["est_delivery_date"])
 
 						if index == -1:
