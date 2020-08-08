@@ -22,5 +22,6 @@ def create_tracker(tracking_code, carrier):
 				tracking_code=tracking_code,
 				carrier=carrier
 			)
-	except:
+	except easypost.Error as e:
 		print("Error while creating EasyPost tracker for: " + str(tracking_code))
+		print(e.json_body["message"])
