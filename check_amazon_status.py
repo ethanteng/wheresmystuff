@@ -13,7 +13,10 @@ def get_status(url):
 	soup = BeautifulSoup(source, 'lxml')
 
 	delivery_status = soup.find(id="primaryStatus")
-	return(delivery_status.text)
+	if delivery_status is not None:
+		return(delivery_status.text)
+	else:
+		return(delivery_status)
 
 
 # Setup MySQL Connection
@@ -28,32 +31,34 @@ for delivery in deliveries:
 
 	pkg_id = delivery["package_id"]
 	url = delivery["tracking_url"]
-	old_status = delivery["status"]
-	new_status = get_status(url)
+	old_status = str(delivery["status"])
 
-	if (old_status != new_status):
-		update = """UPDATE amazon_delivery SET status = %s, updated_at = %s where package_id = %s"""
-		updated_at = datetime.datetime.now()
-		values = (new_status, updated_at, pkg_id)
-		cursor.execute(update, values)
-		db.commit()
+	if "Delivered" not in old_status:
 
-		# Send update email
-		tracking_code = None
-		tracker_id = None
-		status = None
-		origin = None
-		destination = None
-		carrier = None
-		est_delivery_date_obj = None
-		status_detail = None
-		current_city = None
-		current_state = None
-		current_country = None
-		public_url = None
+		new_status = str(get_status(url))
+		if ((old_status != new_status) and (new_status != "None")):
+			update = """UPDATE amazon_delivery SET status = %s, updated_at = %s where package_id = %s"""
+			updated_at = datetime.datetime.now()
+			values = (new_status, updated_at, pkg_id)
+			cursor.execute(update, values)
+			db.commit()
 
-		tracking_code = delivery["tracking_code"]
-		status = new_status
-		public_url = url
+			# Send update email
+			tracking_code = None
+			tracker_id = None
+			status = None
+			origin = None
+			destination = None
+			carrier = None
+			est_delivery_date_obj = None
+			status_detail = None
+			current_city = None
+			current_state = None
+			current_country = None
+			public_url = None
 
-		send_email_helper.send_email(tracking_code, status, status_detail, est_delivery_date_obj, carrier, origin, destination, current_city, current_state, current_country, public_url)
+			tracking_code = delivery["tracking_code"]
+			status = new_status
+			public_url = url
+
+			send_email_helper.send_email(tracking_code, status, status_detail, est_delivery_date_obj, carrier, origin, destination, current_city, current_state, current_country, public_url)
