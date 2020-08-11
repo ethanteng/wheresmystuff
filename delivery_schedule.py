@@ -6,7 +6,7 @@ import datetime
 from datetime import datetime
 from dateutil import tz
 import email_helper
-from check_amazon import check_amazon
+from check_custom_carrier import check_custom_carrier
 
 
 def get_packages_for_user(user_id):
@@ -24,7 +24,8 @@ def get_packages_for_user(user_id):
 
 		tracking_code = package["tracking_code"]
 		package_id = package["id"]
-		if not check_amazon(tracking_code):
+		carrier = package["carrier"]
+		if not check_custom_carrier(tracking_code, carrier):
 			get_trackers_query = """SELECT * FROM trackers WHERE package_id = %s"""
 			get_trackers_parameters = [package_id]
 
@@ -57,18 +58,18 @@ def get_packages_for_user(user_id):
 					else:
 						user_packages[index].append(package)
 		else:
-			get_trackers_query = """SELECT * FROM amazon_delivery WHERE package_id = %s"""
+			get_trackers_query = """SELECT * FROM custom_carrier_deliveries WHERE package_id = %s"""
 			get_trackers_parameters = [package_id]
 
 			cursor.execute(get_trackers_query, get_trackers_parameters)
 			tracker = cursor.fetchone()
 			if tracker["status"] is not None:
 				if tracker["status"].find("Delivered") == -1: # Skip packages that have already been delivered
-					fake_date_amazon = datetime.strptime("January 31, 2200", "%B %d, %Y")
-					index = get_index_of_date(user_packages, fake_date_amazon)
+					fake_date = datetime.strptime("January 31, 2200", "%B %d, %Y")
+					index = get_index_of_date(user_packages, fake_date)
 
 					if index == -1:
-						user_packages.append([fake_date_amazon, package])
+						user_packages.append([fake_date, package])
 					else:
 						user_packages[index].append(package)
 
@@ -96,14 +97,14 @@ def generate_delivery_schedule_for_user(user, user_packages):
 	for user_package in user_packages:
 		json_key = ""
 		fake_date = datetime.strptime("January 31, 2100", "%B %d, %Y")
-		fake_date_amazon = datetime.strptime("January 31, 2200", "%B %d, %Y")
+		fake_date_custom_carriers = datetime.strptime("January 31, 2200", "%B %d, %Y")
 		if user_package[0] < fake_date:
 			delivery_date = user_package[0].strftime("%A %B %d, %Y")
 			json_key = "Arriving on " + delivery_date + ":"
-		elif user_package[0] < fake_date_amazon:
+		elif user_package[0] < fake_date_custom_carriers:
 			json_key = "Delivery date unknown for:"
 		else:
-			json_key = "Deliveries by Amazon couriers:"
+			json_key = "Deliveries by other couriers:"
 
 
 		json_value = ""
@@ -147,13 +148,13 @@ def get_current_status(package):
 	db = MySQLdb.connect(host="localhost", user="root", passwd=config.db_password, db="wheresmystuff")
 	cursor = db.cursor(MySQLdb.cursors.DictCursor)
 
-	if not check_amazon(package["tracking_code"]):
+	if not check_custom_carrier(package["tracking_code"], package["carrier"]):
 		query = """SELECT * FROM trackers WHERE package_id = %s"""
 		parameters = [package["id"]]
 		cursor.execute(query, parameters)
 		tracker = cursor.fetchone()
 	else:
-		query = """SELECT * FROM amazon_delivery WHERE package_id = %s"""
+		query = """SELECT * FROM custom_carrier_deliveries WHERE package_id = %s"""
 		parameters = [package["id"]]
 		cursor.execute(query, parameters)
 		tracker = cursor.fetchone()
@@ -166,7 +167,7 @@ def get_current_location(package):
 	db = MySQLdb.connect(host="localhost", user="root", passwd=config.db_password, db="wheresmystuff")
 	cursor = db.cursor(MySQLdb.cursors.DictCursor)
 
-	if not check_amazon(package["tracking_code"]):
+	if not check_custom_carrier(package["tracking_code"], package["carrier"]):
 		query = """SELECT * FROM trackers WHERE package_id = %s"""
 		parameters = [package["id"]]
 		cursor.execute(query, parameters)
@@ -186,7 +187,7 @@ def get_current_location(package):
 				country = tracker["current_country"]
 			location = city + " " + state + " " + country
 	else:
-		location = "Amazon location"
+		location = "unknown location"
 	
 	return(location)
 

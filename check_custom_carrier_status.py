@@ -8,7 +8,7 @@ import datetime
 import send_email_helper
 
 
-def get_status(url):
+def get_status(url, carrier):
 	#source = requests.get(url).text
 	source = requests.get(
 	    url,
@@ -18,7 +18,11 @@ def get_status(url):
 	).text
 	soup = BeautifulSoup(source, 'lxml')
 
-	delivery_status = soup.find(id="primaryStatus")
+	if carrier == "ECom Express":
+		delivery_status = soup.find(id="item_status")
+	else:	# Amazon 
+		delivery_status = soup.find(id="primaryStatus")
+
 	if delivery_status is not None:
 		return(delivery_status.text)
 	else:
@@ -29,7 +33,7 @@ def get_status(url):
 db = MySQLdb.connect(host="localhost", user="root", passwd=config.db_password, db="wheresmystuff")
 cursor = db.cursor(MySQLdb.cursors.DictCursor)
 
-query = """SELECT * FROM amazon_delivery INNER JOIN packages ON amazon_delivery.package_id = packages.id"""
+query = """SELECT * FROM custom_carrier_deliveries INNER JOIN packages ON custom_carrier_deliveries.package_id = packages.id"""
 cursor.execute(query)
 deliveries = cursor.fetchall()
 
@@ -37,13 +41,15 @@ for delivery in deliveries:
 
 	pkg_id = delivery["package_id"]
 	url = delivery["tracking_url"]
+	carrier = delivery["carrier"]
 	old_status = str(delivery["status"])
 
 	if "Delivered" not in old_status:
 
-		new_status = str(get_status(url))
+		new_status = str(get_status(url, carrier))
 		if ((old_status != new_status) and (new_status != "None")):
-			update = """UPDATE amazon_delivery SET status = %s, updated_at = %s where package_id = %s"""
+			
+			update = """UPDATE custom_carrier_deliveries SET status = %s, updated_at = %s where package_id = %s"""
 			updated_at = datetime.datetime.now()
 			values = (new_status, updated_at, pkg_id)
 			cursor.execute(update, values)

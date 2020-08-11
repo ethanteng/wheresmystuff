@@ -32,12 +32,12 @@ with open(filepath, mode='r') as csv_file:
 		description = row["description"]
 		if description == "":
 			description = None
-		amazon_url = row["amazon_url"]
-		if amazon_url == "":
-			amazon_url = None
+		custom_url = row["custom_url"]
+		if custom_url == "":
+			custom_url = None
 
 		user_id = create_user.create_user(first_name, last_name, email)
-		created_new_package = create_package.create_package(user_id, tracking_code, carrier, description, amazon_url)
+		created_new_package = create_package.create_package(user_id, tracking_code, carrier, description, custom_url)
 		
 		if (created_new_package):
 			email_helper.send_ack_via_mailgun(email, tracking_code, description)

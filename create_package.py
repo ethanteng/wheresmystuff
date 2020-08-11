@@ -2,9 +2,9 @@
 import MySQLdb
 import config
 import create_tracker
-import check_amazon
+import check_custom_carrier
 
-def create_package(user_id, tracking_code, carrier, description, amazon_url):
+def create_package(user_id, tracking_code, carrier, description, custom_url):
 	# Setup MySQL Connection
 	db = MySQLdb.connect(host="localhost", user="root", passwd=config.db_password, db="wheresmystuff")
 	cursor = db.cursor()
@@ -32,7 +32,7 @@ def create_package(user_id, tracking_code, carrier, description, amazon_url):
 		pkg_id = cursor.lastrowid
 		created_new_pkg = True
 
-		if not check_amazon.check_amazon(tracking_code):
+		if not check_custom_carrier.check_custom_carrier(tracking_code, carrier):
 
 			# Create the associated tracker db entry
 			query = "INSERT INTO trackers (package_id) VALUES (%s)"
@@ -46,8 +46,8 @@ def create_package(user_id, tracking_code, carrier, description, amazon_url):
 			create_tracker.create_tracker(tracking_code, carrier)
 		else:
 
-			query = "INSERT INTO amazon_delivery (package_id, tracking_url) VALUES (%s, %s)"
-			values = (pkg_id, amazon_url)
+			query = "INSERT INTO custom_carrier_deliveries (package_id, tracking_url) VALUES (%s, %s)"
+			values = (pkg_id, custom_url)
 			cursor.execute(query, values)
 
 			db.commit()
