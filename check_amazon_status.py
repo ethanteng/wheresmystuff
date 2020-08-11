@@ -9,7 +9,13 @@ import send_email_helper
 
 
 def get_status(url):
-	source = requests.get(url).text
+	#source = requests.get(url).text
+	source = requests.get(
+	    url,
+	    proxies={
+	        "http": "http://" + config.crawlera_key + ":@proxy.crawlera.com:8010/",
+	    },
+	).text
 	soup = BeautifulSoup(source, 'lxml')
 
 	delivery_status = soup.find(id="primaryStatus")
