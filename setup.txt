@@ -10,6 +10,12 @@ env = "test"
 ./setup_templates.py
 
 
+### Download Crawlera cert
+wget https://doc.scrapinghub.com/_downloads/639adb203cdcb1249a5a7618d9f4fa96/crawlera-ca.crt
+sudo cp crawlera-ca.crt /usr/local/share/ca-certificates/crawlera-ca.crt
+sudo update-ca-certificates
+
+
 ### Start Flask
 export FLASK_APP=main.py
 python3 -m flask run
@@ -33,6 +39,12 @@ env = "prod"
 
 ### Upload email templates to Mailgun
 ./setup_templates.py
+
+
+### Download Crawlera cert
+wget https://doc.scrapinghub.com/_downloads/639adb203cdcb1249a5a7618d9f4fa96/crawlera-ca.crt
+sudo cp crawlera-ca.crt /usr/local/share/ca-certificates/crawlera-ca.crt
+sudo update-ca-certificates
 
 
 ### Start Flask if not already included in startup script
