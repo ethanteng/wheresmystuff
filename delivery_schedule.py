@@ -139,7 +139,7 @@ def send_email(user, email_json):
 	bcc_addr = "ethanteng@gmail.com"
 	PST_tz = tz.gettz("America/Los_Angeles")
 	today = datetime.now(tz=PST_tz).strftime("%b %-d")
-	subject = str(today) + ": your updated delivery schedule"
+	subject = "Packages arriving today " + str(today)
 	email_helper.send_schedule_via_mailgun(from_addr, to_addr, bcc_addr, subject, email_json)
 
 
