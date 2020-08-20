@@ -63,15 +63,16 @@ def get_packages_for_user(user_id):
 
 			cursor.execute(get_trackers_query, get_trackers_parameters)
 			tracker = cursor.fetchone()
-			if tracker["status"] is not None:
-				if tracker["status"].find("Delivered") == -1: # Skip packages that have already been delivered
-					fake_date = datetime.strptime("January 31, 2200", "%B %d, %Y")
-					index = get_index_of_date(user_packages, fake_date)
+			if tracker is not None:
+				if tracker["status"] is not None:
+					if tracker["status"].find("Delivered") == -1: # Skip packages that have already been delivered
+						fake_date = datetime.strptime("January 31, 2200", "%B %d, %Y")
+						index = get_index_of_date(user_packages, fake_date)
 
-					if index == -1:
-						user_packages.append([fake_date, package])
-					else:
-						user_packages[index].append(package)
+						if index == -1:
+							user_packages.append([fake_date, package])
+						else:
+							user_packages[index].append(package)
 
 	return(user_packages)
 
