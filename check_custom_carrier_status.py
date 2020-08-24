@@ -6,27 +6,66 @@ import MySQLdb
 import config
 import datetime
 import send_email_helper
+from urllib.request import Request, urlopen
+from fake_useragent import UserAgent
+import random
 
 
 def get_status(url, carrier):
-	#source = requests.get(url).text
-	source = requests.get(
-	    url,
-	    proxies={
-	        "http": "http://" + config.crawlera_key + ":@proxy.crawlera.com:8010/",
-	    },
-	).text
-	soup = BeautifulSoup(source, 'lxml')
 
-	if carrier == "ECom Express":
-		delivery_status = soup.find(id="item_status")
-	else:	# Amazon 
-		delivery_status = soup.find(id="primaryStatus")
+	ua = UserAgent() # From here we generate a random user agent
+	proxies = [] # Will contain proxies [ip, port]
 
-	if delivery_status is not None:
-		return(delivery_status.text)
-	else:
-		return(delivery_status)
+	# Retrieve latest proxies
+	proxies_req = Request(config.proxy_list_url)
+	proxies_req.add_header('User-Agent', ua.random)
+	proxies_doc = urlopen(proxies_req)
+
+	# Save proxies in the array
+	for proxy_line in proxies_doc:
+
+		full_ip = proxy_line.decode('utf8').rstrip()
+		split_ip = full_ip.split(":")
+		proxies.append({
+			'ip': split_ip[0],
+			'port': split_ip[1]
+		})
+
+	# Choose a random proxy
+	proxy_index = random_proxy(proxies)
+	proxy = proxies[proxy_index]
+
+	req = Request(url)
+	req.add_header('User-Agent', ua.random)
+	req.set_proxy(proxy['ip'] + ':' + proxy['port'], 'https')
+
+	#for n in range(1, len(proxies)): # Try all available proxies
+	for n in range(1, 20): # Try max 20 times
+		try:
+			source = urlopen(req, timeout=5).read().decode('utf8')
+			soup = BeautifulSoup(source, 'lxml')
+
+			if carrier == "ECom Express":
+				delivery_status = soup.find(id="item_status")
+			else:	# Amazon 
+				delivery_status = soup.find(id="primaryStatus")
+
+			if delivery_status is not None:
+				return(delivery_status.text)
+			else:
+				return(delivery_status)
+		except Exception as e:			
+			del proxies[proxy_index]
+			proxy_index = random_proxy(proxies)
+			proxy = proxies[proxy_index] # New proxy
+			req = Request(url)
+			req.add_header('User-Agent', ua.random) # New user agent
+			req.set_proxy(proxy['ip'] + ':' + proxy['port'], 'https')
+
+
+# Retrieve a random index proxy (we need the index to delete it if not working)
+def random_proxy(proxies):
+	return random.randint(0, len(proxies) - 1)
 
 
 # Setup MySQL Connection
