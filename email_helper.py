@@ -47,10 +47,10 @@ def send_ack_via_mailgun(email, tracking_code, description):
 	to_addr = str(email)
 	bcc_addr = "ethanteng@gmail.com"
 	if description is not None:
-		email_subject = "WheresMyStuff is now tracking your " + str(description) + " (" + str(tracking_code) + ")"
+		email_subject = "WheresMyStuff is now tracking your " + str(description)
 	else:
 		email_subject = "WheresMyStuff is now tracking your package " + str(tracking_code)
-	email_body = "Thanks for using WheresMyStuff! You will now start getting emails from support@wheresmystuff.co with updates about this package (" + str(tracking_code) + ")."
+	email_body = "Thanks for using WheresMyStuff! You will now start getting emails from support@wheresmystuff.co with updates about this package."
 
 	api_url = None
 	if config.env == "test":

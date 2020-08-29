@@ -115,7 +115,7 @@ def generate_delivery_schedule_for_user(user, user_packages):
 			current_location = None
 
 			if user_package[i]["description"] is not None:
-				description = str(user_package[i]["description"]) + " (" + str(user_package[i]["tracking_code"]) + "):"
+				description = str(user_package[i]["description"]) + ":"
 			else:
 				description = str(user_package[i]["tracking_code"]) + ":"
 
