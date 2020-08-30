@@ -9,63 +9,45 @@ import send_email_helper
 from urllib.request import Request, urlopen
 from fake_useragent import UserAgent
 import random
+from scraper_api import ScraperAPIClient
+import requests
 
 
 def get_status(url, carrier):
 
-	ua = UserAgent() # From here we generate a random user agent
-	proxies = [] # Will contain proxies [ip, port]
+	try:
+		if carrier == "ECom Express":
+			proxies = {
+			  "http": "http://scraperapi:" + config.scraperapi_api_key + "@proxy-server.scraperapi.com:8001",
+			  "https": "http://scraperapi:" + config.scraperapi_api_key + "@proxy-server.scraperapi.com:8001"
+			}
+			result = requests.get(url, proxies=proxies, verify=False).text
+			soup = BeautifulSoup(result, 'lxml')
+			delivery_status = soup.find(id="item_status")
+		elif carrier == "NZ Post":
+			proxies = {
+			  "http": "http://scraperapi.render=true:" + config.scraperapi_api_key + "@proxy-server.scraperapi.com:8001",
+			  "https": "http://scraperapi.render=true:" + config.scraperapi_api_key + "@proxy-server.scraperapi.com:8001"
+			}
+			result = requests.get(url, proxies=proxies, verify=False).text
+			soup = BeautifulSoup(result, 'lxml')
+			print(soup.prettify())
+			delivery_status = soup.find(class_="timeline-status")
+		else:	# Amazon 
+			proxies = {
+			  "http": "http://scraperapi:" + config.scraperapi_api_key + "@proxy-server.scraperapi.com:8001",
+			  "https": "http://scraperapi:" + config.scraperapi_api_key + "@proxy-server.scraperapi.com:8001"
+			}
+			result = requests.get(url, proxies=proxies, verify=False).text
+			soup = BeautifulSoup(result, 'lxml')
+			delivery_status = soup.find(id="primaryStatus")
 
-	# Retrieve latest proxies
-	proxies_req = Request(config.proxy_list_url)
-	proxies_req.add_header('User-Agent', ua.random)
-	proxies_doc = urlopen(proxies_req)
-
-	# Save proxies in the array
-	for proxy_line in proxies_doc:
-
-		full_ip = proxy_line.decode('utf8').rstrip()
-		split_ip = full_ip.split(":")
-		proxies.append({
-			'ip': split_ip[0],
-			'port': split_ip[1]
-		})
-
-	# Choose a random proxy
-	proxy_index = random_proxy(proxies)
-	proxy = proxies[proxy_index]
-
-	req = Request(url)
-	req.add_header('User-Agent', ua.random)
-	req.set_proxy(proxy['ip'] + ':' + proxy['port'], 'https')
-
-	#for n in range(1, len(proxies)): # Try all available proxies
-	for n in range(1, 20): # Try max 20 times
-		try:
-			source = urlopen(req, timeout=5).read().decode('utf8')
-			soup = BeautifulSoup(source, 'lxml')
-
-			if carrier == "ECom Express":
-				delivery_status = soup.find(id="item_status")
-			else:	# Amazon 
-				delivery_status = soup.find(id="primaryStatus")
-
-			if delivery_status is not None:
-				return(delivery_status.text)
-			else:
-				return(delivery_status)
-		except Exception as e:			
-			del proxies[proxy_index]
-			proxy_index = random_proxy(proxies)
-			proxy = proxies[proxy_index] # New proxy
-			req = Request(url)
-			req.add_header('User-Agent', ua.random) # New user agent
-			req.set_proxy(proxy['ip'] + ':' + proxy['port'], 'https')
-
-
-# Retrieve a random index proxy (we need the index to delete it if not working)
-def random_proxy(proxies):
-	return random.randint(0, len(proxies) - 1)
+		if delivery_status is not None:
+			return(delivery_status.text)
+		else:
+			return(delivery_status)
+	except Exception as e:			
+		print(e)
 
 
 # Setup MySQL Connection
