@@ -31,7 +31,6 @@ def get_status(url, carrier):
 			}
 			result = requests.get(url, proxies=proxies, verify=False).text
 			soup = BeautifulSoup(result, 'lxml')
-			print(soup.prettify())
 			delivery_status = soup.find(class_="timeline-status")
 		else:	# Amazon 
 			proxies = {
