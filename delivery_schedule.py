@@ -31,7 +31,7 @@ def get_packages_for_user(user_id):
 
 			cursor.execute(get_trackers_query, get_trackers_parameters)
 			tracker = cursor.fetchone()
-			if tracker["status"] != "delivered": # Skip packages that have already been delivered
+			if (tracker["status"] != "delivered") and (tracker["status"] != "lost"): # Skip packages that have already been delivered or are currently lost
 				
 				if tracker["est_delivery_date"] is not None:
 					if tracker["status"] in ("unknown","pre_transit","in_transit","out_for_delivery","available_for_pickup","delayed"):
@@ -65,7 +65,7 @@ def get_packages_for_user(user_id):
 			tracker = cursor.fetchone()
 			if tracker is not None:
 				if tracker["status"] is not None:
-					if tracker["status"].find("Delivered") == -1: # Skip packages that have already been delivered
+					if (tracker["status"].find("Delivered") == -1) and (tracker["status"].find("lost") == -1): # Skip packages that have already been delivered or lost
 						fake_date = datetime.strptime("January 31, 2200", "%B %d, %Y")
 						index = get_index_of_date(user_packages, fake_date)
 
