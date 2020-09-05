@@ -97,9 +97,14 @@ def generate_delivery_schedule_for_user(user, user_packages):
 
 	for user_package in user_packages:
 		json_key = ""
+		PST_tz = tz.gettz("America/Los_Angeles")
+		today = datetime.now(tz=PST_tz).strftime("%B %d, %Y")
 		fake_date = datetime.strptime("January 31, 2100", "%B %d, %Y")
 		fake_date_custom_carriers = datetime.strptime("January 31, 2200", "%B %d, %Y")
-		if user_package[0] < fake_date:
+
+		if user_package[0].strftime("%B %d, %Y") == today:
+			json_key = "ARRIVING TODAY:"
+		elif user_package[0] < fake_date:
 			delivery_date = user_package[0].strftime("%A %B %d, %Y")
 			json_key = "Arriving on " + delivery_date + ":"
 		elif user_package[0] < fake_date_custom_carriers:
@@ -140,7 +145,7 @@ def send_email(user, email_json):
 	bcc_addr = "ethanteng@gmail.com"
 	PST_tz = tz.gettz("America/Los_Angeles")
 	today = datetime.now(tz=PST_tz).strftime("%b %-d")
-	subject = "Packages arriving today " + str(today)
+	subject = str(today) + ": your packages are coming"
 	email_helper.send_schedule_via_mailgun(from_addr, to_addr, bcc_addr, subject, email_json)
 
 
