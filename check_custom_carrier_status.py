@@ -90,6 +90,7 @@ for delivery in deliveries:
 			public_url = None
 
 			tracking_code = delivery["tracking_code"]
+			carrier = delivery["carrier"]
 			status = new_status
 			public_url = url
 
