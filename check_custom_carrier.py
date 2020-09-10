@@ -7,4 +7,8 @@ def check_amazon(tracking_code):
 
 def check_custom_carrier(tracking_code, carrier):
 
-	return(carrier == "ECom Express" or carrier == "NZ Post" or carrier == "HK Post" or check_amazon(tracking_code))
+	return(carrier == "ECom Express" or
+		carrier == "NZ Post" or
+		carrier == "HK Post" or
+		carrier == "AliExpress" or
+		check_amazon(tracking_code))

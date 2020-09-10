@@ -40,6 +40,14 @@ def get_status(url, carrier):
 			result = requests.get(url, proxies=proxies, verify=False).text
 			soup = BeautifulSoup(result, 'lxml')
 			delivery_status = soup.find(class_="message")
+		elif carrier == "AliExpress":
+			proxies = {
+			  "http": "http://scraperapi.render=true:" + config.scraperapi_api_key + "@proxy-server.scraperapi.com:8001",
+			  "https": "http://scraperapi.render=true:" + config.scraperapi_api_key + "@proxy-server.scraperapi.com:8001"
+			}
+			result = requests.get(url, proxies=proxies, verify=False).text
+			soup = BeautifulSoup(result, 'lxml')
+			delivery_status = soup.find(class_="waybill_title")
 		else:	# Amazon 
 			proxies = {
 			  "http": "http://scraperapi:" + config.scraperapi_api_key + "@proxy-server.scraperapi.com:8001",
