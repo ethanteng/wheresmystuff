@@ -88,7 +88,7 @@ for delivery in deliveries:
 	carrier = delivery["carrier"]
 	old_status = str(delivery["status"])
 
-	if (("Delivered" not in old_status) or ("delivered" not in old_status)):
+	if (("Delivered" not in old_status) and ("delivered" not in old_status)):
 
 		new_status = str(get_status(url, carrier))
 		if ((old_status != new_status) and (new_status != "None")):
