@@ -47,7 +47,15 @@ def get_status(url, carrier):
 			}
 			result = requests.get(url, proxies=proxies, verify=False).text
 			soup = BeautifulSoup(result, 'lxml')
-			delivery_status = soup.find(class_="waybill_title")
+			delivery_status = soup.find(class_="waybill-detail-title")
+		elif carrier == "Royal Mail":
+			proxies = {
+			  "http": "http://scraperapi.render=true:" + config.scraperapi_api_key + "@proxy-server.scraperapi.com:8001",
+			  "https": "http://scraperapi.render=true:" + config.scraperapi_api_key + "@proxy-server.scraperapi.com:8001"
+			}
+			result = requests.get(url, proxies=proxies, verify=False).text
+			soup = BeautifulSoup(result, 'lxml')
+			delivery_status = soup.find('span',{'class':'title'})
 		else:	# Amazon 
 			proxies = {
 			  "http": "http://scraperapi:" + config.scraperapi_api_key + "@proxy-server.scraperapi.com:8001",
@@ -80,7 +88,7 @@ for delivery in deliveries:
 	carrier = delivery["carrier"]
 	old_status = str(delivery["status"])
 
-	if "Delivered" not in old_status:
+	if (("Delivered" not in old_status) or ("delivered" not in old_status)):
 
 		new_status = str(get_status(url, carrier))
 		if ((old_status != new_status) and (new_status != "None")):

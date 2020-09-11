@@ -11,4 +11,5 @@ def check_custom_carrier(tracking_code, carrier):
 		carrier == "NZ Post" or
 		carrier == "HK Post" or
 		carrier == "AliExpress" or
+		carrier == "Royal Mail" or
 		check_amazon(tracking_code))
