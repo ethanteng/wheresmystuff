@@ -28,7 +28,7 @@ def send_email(tracking_code, status, status_detail, est_delivery_date, carrier,
 	# Formatting the delivery date to be more human-readable (with AM / PM)
 	est_delivery_date_ampm = None
 	if check_custom_carrier.check_custom_carrier(tracking_code, carrier):	
-		est_delivery_date_ampm = status
+		est_delivery_date_ampm = None
 	else:
 		if est_delivery_date is not None:
 			est_delivery_date_ampm = est_delivery_date.strftime("%b %d %Y %-I:%M%p")

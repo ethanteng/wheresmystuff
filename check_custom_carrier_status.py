@@ -32,6 +32,8 @@ def get_status(url, carrier):
 			result = requests.get(url, proxies=proxies, verify=False).text
 			soup = BeautifulSoup(result, 'lxml')
 			delivery_status = soup.find(class_="timeline-status")
+			if (delivery_status is None):
+				delivery_status = soup.find(class_="delivered-content")
 		elif carrier == "HK Post":
 			proxies = {
 			  "http": "http://scraperapi.render=true:" + config.scraperapi_api_key + "@proxy-server.scraperapi.com:8001",
@@ -48,6 +50,12 @@ def get_status(url, carrier):
 			result = requests.get(url, proxies=proxies, verify=False).text
 			soup = BeautifulSoup(result, 'lxml')
 			delivery_status = soup.find(class_="waybill-detail-title")
+			delivery_details = soup.find(class_="waybill-path")
+
+			if ((delivery_status is not None) and (delivery_details is not None)):
+				for detail in delivery_details:
+					delivery_status = delivery_status.text + ": " + BeautifulSoup(str(detail), "lxml").text
+					break
 		elif carrier == "Royal Mail":
 			proxies = {
 			  "http": "http://scraperapi.render=true:" + config.scraperapi_api_key + "@proxy-server.scraperapi.com:8001",
@@ -66,7 +74,10 @@ def get_status(url, carrier):
 			delivery_status = soup.find(id="primaryStatus")
 
 		if delivery_status is not None:
-			return(delivery_status.text)
+			if type(delivery_status) == str:
+				return(delivery_status)
+			else:
+				return(delivery_status.text)
 		else:
 			return(delivery_status)
 	except Exception as e:			
