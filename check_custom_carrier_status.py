@@ -63,7 +63,7 @@ def get_status(url, carrier):
 			}
 			result = requests.get(url, proxies=proxies, verify=False).text
 			soup = BeautifulSoup(result, 'lxml')
-			delivery_status = soup.find('span',{'class':'title'})
+			delivery_status = soup.find(class_="j-body")
 		else:	# Amazon 
 			proxies = {
 			  "http": "http://scraperapi:" + config.scraperapi_api_key + "@proxy-server.scraperapi.com:8001",
