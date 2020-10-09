@@ -65,7 +65,7 @@ def get_packages_for_user(user_id):
 			tracker = cursor.fetchone()
 			if tracker is not None:
 				if tracker["status"] is not None:
-					if (tracker["status"].find("Delivered") == -1) and (tracker["status"].find("lost") == -1): # Skip packages that have already been delivered or lost
+					if (tracker["status"].find("Delivered") == -1) and (tracker["status"].find("delivered") == -1) and (tracker["status"].find("lost") == -1): # Skip packages that have already been delivered or lost
 						fake_date = datetime.strptime("January 31, 2200", "%B %d, %Y")
 						index = get_index_of_date(user_packages, fake_date)
 
