@@ -5,6 +5,12 @@ python
 flask
 ngrok
 mysql
+
+
+
+===================
+3rd party APIs used
+===================
 mailgun
 easypost
 scraperapi
@@ -12,9 +18,9 @@ scraperapi
 
 
 
-============================
-Required packages to install
-============================
+=========================
+Install required packages
+=========================
 pip install requests
 sudo apt-get install python3-dev default-libmysqlclient-dev build-essential
 pip install mysqlclient
@@ -39,9 +45,9 @@ env = "test"
 
 
 ### Download Crawlera cert
-wget https://doc.scrapinghub.com/_downloads/639adb203cdcb1249a5a7618d9f4fa96/crawlera-ca.crt
-sudo cp crawlera-ca.crt /usr/local/share/ca-certificates/crawlera-ca.crt
-sudo update-ca-certificates
+#wget https://doc.scrapinghub.com/_downloads/639adb203cdcb1249a5a7618d9f4fa96/crawlera-ca.crt
+#sudo cp crawlera-ca.crt /usr/local/share/ca-certificates/crawlera-ca.crt
+#sudo update-ca-certificates
 
 
 ### Start Flask
@@ -50,17 +56,10 @@ export FLASK_APP=main.py
 python3 -m flask run
 
 
-### Start ngrok (new instructions)
+### Start ngrok
 cp ngrok_test.yml /home/ethan/snap/ngrok/89/.config/ngrok/ngrok.yml
 [add ngrok_auth_token to ngrok.yml]
 ngrok start --all --config="/home/ethan/snap/ngrok/89/.config/ngrok/ngrok.yml"
-
-
-### Start ngrok (old instructions)
-#cp ngrok_test.yml /home/ubuntu/.ngrok2/ngrok.yml
-#[add ngrok_auth_token to ngrok.yml]
-#cd /home/ubuntu/Downloads
-#./ngrok start --all --config="/home/ubuntu/.ngrok2/ngrok.yml"
 
 
 
@@ -77,9 +76,9 @@ env = "prod"
 
 
 ### Download Crawlera cert
-wget https://doc.scrapinghub.com/_downloads/639adb203cdcb1249a5a7618d9f4fa96/crawlera-ca.crt
-sudo cp crawlera-ca.crt /usr/local/share/ca-certificates/crawlera-ca.crt
-sudo update-ca-certificates
+#wget https://doc.scrapinghub.com/_downloads/639adb203cdcb1249a5a7618d9f4fa96/crawlera-ca.crt
+#sudo cp crawlera-ca.crt /usr/local/share/ca-certificates/crawlera-ca.crt
+#sudo update-ca-certificates
 
 
 ### Start Flask if not already included in startup script
