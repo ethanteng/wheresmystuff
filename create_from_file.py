@@ -38,6 +38,7 @@ with open(filepath, mode='r') as csv_file:
 
 		user_id = create_user.create_user(first_name, last_name, email)
 		created_new_package = create_package.create_package(user_id, tracking_code, carrier, description, custom_url)
-		
+		#print("Created new package: " + str(created_new_package))
+
 		if (created_new_package):
 			email_helper.send_ack_via_mailgun(email, tracking_code, description)

@@ -6,12 +6,15 @@ import json
 def send_update_via_mailgun(from_addr, to_addr, bcc_addr, email_subject, email_json):
 
 	api_url = None
+	api_key = None
 	if config.env == "test":
 		api_url = "https://api.mailgun.net/v3/" + config.mailgun_test_url + "/messages"
+		api_key = config.mailgun_test_api_key
 	else:
 		api_url = "https://api.mailgun.net/v3/" + config.mailgun_prod_url + "/messages"
+		api_key = config.mailgun_api_key
 
-	api_key = config.mailgun_api_key
+	#api_key = config.mailgun_api_key
 	requests.post(api_url,
 			auth=("api",api_key),
 			data={"from": from_addr,
@@ -25,12 +28,15 @@ def send_update_via_mailgun(from_addr, to_addr, bcc_addr, email_subject, email_j
 def send_schedule_via_mailgun(from_addr, to_addr, bcc_addr, email_subject, email_json):
 	
 	api_url = None
+	api_key = None
 	if config.env == "test":
 		api_url = "https://api.mailgun.net/v3/" + config.mailgun_test_url + "/messages"
+		api_key = config.mailgun_test_api_key
 	else:
 		api_url = "https://api.mailgun.net/v3/" + config.mailgun_prod_url + "/messages"
+		api_key = config.mailgun_api_key
 
-	api_key = config.mailgun_api_key
+	#api_key = config.mailgun_api_key
 	requests.post(api_url,
 			auth=("api",api_key),
 			data={"from": from_addr,
@@ -53,12 +59,15 @@ def send_ack_via_mailgun(email, tracking_code, description):
 	email_body = "Thanks for using WheresMyStuff! You will now start getting emails from support@wheresmystuff.co with updates about this package."
 
 	api_url = None
+	api_key = None
 	if config.env == "test":
 		api_url = "https://api.mailgun.net/v3/" + config.mailgun_test_url + "/messages"
+		api_key = config.mailgun_test_api_key
 	else:
 		api_url = "https://api.mailgun.net/v3/" + config.mailgun_prod_url + "/messages"
+		api_key = config.mailgun_api_key
 
-	api_key = config.mailgun_api_key
+	#api_key = config.mailgun_api_key
 	requests.post(api_url,
 			auth=("api",api_key),
 			data={"from": from_addr,

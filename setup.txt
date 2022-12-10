@@ -1,3 +1,31 @@
+==========
+Tech stack
+==========
+python
+flask
+ngrok
+mysql
+mailgun
+easypost
+scraperapi
+#crawlera
+
+
+
+============================
+Required packages to install
+============================
+pip install requests
+sudo apt-get install python3-dev default-libmysqlclient-dev build-essential
+pip install mysqlclient
+pip install easypost
+pip install scraperapi-sdk
+pip install bs4
+pip install lxml
+pip install fake_useragent
+
+
+
 =========
 Local env
 =========
@@ -17,15 +45,22 @@ sudo update-ca-certificates
 
 
 ### Start Flask
+. local/bin/activate ## 'local' is the name of the virtual env
 export FLASK_APP=main.py
 python3 -m flask run
 
 
-### Start ngrok
-cp ngrok_test.yml /home/ubuntu/.ngrok2/ngrok.yml
+### Start ngrok (new instructions)
+cp ngrok_test.yml /home/ethan/snap/ngrok/89/.config/ngrok/ngrok.yml
 [add ngrok_auth_token to ngrok.yml]
-cd /home/ubuntu/Downloads
-./ngrok start --all --config="/home/ubuntu/.ngrok2/ngrok.yml"
+ngrok start --all --config="/home/ethan/snap/ngrok/89/.config/ngrok/ngrok.yml"
+
+
+### Start ngrok (old instructions)
+#cp ngrok_test.yml /home/ubuntu/.ngrok2/ngrok.yml
+#[add ngrok_auth_token to ngrok.yml]
+#cd /home/ubuntu/Downloads
+#./ngrok start --all --config="/home/ubuntu/.ngrok2/ngrok.yml"
 
 
 
@@ -59,7 +94,7 @@ cd /home/ethanteng_gmail_com
 nohup ./ngrok start --all --config="/home/ethanteng_gmail_com/.ngrok2/ngrok.yml" &
 
 
-### Set up cron job for daily schedule emails & checking status of Amazon-fulfilled packages
+### Set up cron job for daily schedule emails & checking status of custom carrier-fulfilled packages
 crontab -e
 01 00 * * * /home/ethanteng_gmail_com/wheresmystuff/delivery_schedule.py
-* */1 * * * /home/ethanteng_gmail_com/wheresmystuff/check_amazon_status.py
+* */1 * * * /home/ethanteng_gmail_com/wheresmystuff/check_custom_carrier_status.py

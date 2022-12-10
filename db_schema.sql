@@ -1,3 +1,9 @@
+CREATE DATABASE wheresmystuff;
+
+
+USE wheresmystuff;
+
+
 CREATE TABLE users (
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   firstname VARCHAR(30),
@@ -32,7 +38,7 @@ CREATE TABLE trackers (
 
 
 
-CREATE TABLE amazon_delivery (
+CREATE TABLE custom_carrier_deliveries (
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   package_id INT(6) UNSIGNED NOT NULL,
   tracking_url VARCHAR(500) UNIQUE,
