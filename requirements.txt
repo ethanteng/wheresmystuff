@@ -1,0 +1,9 @@
+requests
+sudo apt-get install python3-dev default-libmysqlclient-dev build-essential
+mysqlclient
+easypost
+scraperapi-sdk
+bs4
+lxml
+fake_useragent
+python-dateutil
