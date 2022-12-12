@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+from flask import Response
 import MySQLdb
 import config
 import requests
@@ -198,14 +199,18 @@ def get_current_location(package):
 	return(location)
 
 
-# Setup MySQL Connection
-db = MySQLdb.connect(host="localhost", user="root", passwd=config.db_password, db="wheresmystuff")
-cursor = db.cursor(MySQLdb.cursors.DictCursor)
+def send_delivery_schedule_email(email):
+	# Setup MySQL Connection
+	db = MySQLdb.connect(host="localhost", user="root", passwd=config.db_password, db="wheresmystuff")
+	cursor = db.cursor(MySQLdb.cursors.DictCursor)
 
-cursor.execute("SELECT * FROM users")
-users = cursor.fetchall()
-for user in users:
-	
-	user_packages = get_packages_for_user(user["id"])
-	if (len(user_packages) >= 1):
-		generate_delivery_schedule_for_user(user, user_packages)
+	if email is None:	# Send email to all users
+		cursor.execute("SELECT * FROM users")
+	else:
+		cursor.execute("SELECT * FROM users WHERE email IN " + "('" + email + "')")
+
+	users = cursor.fetchall()
+	for user in users:
+		user_packages = get_packages_for_user(user["id"])
+		if (len(user_packages) >= 1):
+			generate_delivery_schedule_for_user(user, user_packages)

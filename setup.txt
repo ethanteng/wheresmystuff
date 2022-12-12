@@ -29,6 +29,7 @@ pip install scraperapi-sdk
 pip install bs4
 pip install lxml
 pip install fake_useragent
+pip install python-dateutil
 
 
 

@@ -6,11 +6,16 @@ import config
 import datetime
 from datetime import datetime
 import send_email_helper
+import email_helper
+import delivery_schedule
+import create_user
+import create_package
+
 
 app = Flask(__name__)
+
+
 @app.route('/webhook', methods=['POST'])
-
-
 def respond():
 	update = request.json
 
@@ -100,3 +105,47 @@ def update_tracker(tracking_code, tracker_id, status, est_delivery_date, current
 
 	# Save changes to database
 	db.commit()
+
+
+@app.get('/send_email')
+def send_email():
+	args = request.args
+	email = args.get("email")
+	delivery_schedule.send_delivery_schedule_email(email)
+
+	return Response(status=200)
+
+
+@app.post('/new_user')
+def new_user():
+	args = request.args
+	first_name = args.get("first_name")
+	last_name = args.get("last_name")
+	email = args.get("email")
+	user_id = create_user.create_user(first_name,last_name,email)
+
+	return Response(status=201)
+
+
+@app.post('/track_package')
+def track_package():
+	args = request.args
+
+	# Both email and tracking_code are required params
+	email = args.get("email")
+	tracking_code = args.get("tracking_code")
+	if (email is None or tracking_code is None):
+		return Response(status=500)
+	else:
+		# Optional params
+		carrier = args.get("carrier")
+		description = args.get("description")
+		custom_url = args.get("custom_url")
+
+		user_id = create_user.create_user(None, None, email) # create new user if user isn't already in database
+		created_new_package = create_package.create_package(user_id, tracking_code, carrier, description, custom_url)
+		if (created_new_package):
+			email_helper.send_ack_via_mailgun(email, tracking_code, description)
+			return Response(status=201)
+		else:
+			return Response(status=200)
