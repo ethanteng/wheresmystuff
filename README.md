@@ -3,24 +3,24 @@ Track all your package deliveries in one place. Get real-time updates on where y
 
 
 ## Tech stack
-python
-flask
-ngrok
-mysql
+* python
+* flask
+* ngrok
+* mysql
 
 
 ## 3rd party APIs used
-easypost
-mailgun
-scraperapi
+* easypost
+* mailgun
+* scraperapi
 
 
 ## Supported delivery carriers
 100+ carriers supported by [EasyPost](https://www.easypost.com/carriers)
 **plus:**
-ECom Express
-NZ Post
-HK Post
-AliExpress
-Royal Mail
-Amazon
+* ECom Express
+* NZ Post
+* HK Post
+* AliExpress
+* Royal Mail
+* Amazon
