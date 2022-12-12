@@ -1,6 +1,7 @@
 # wheresmystuff
 Track all your package deliveries in one place. Get real-time updates on where your packages are, plus a daily summary of what's arriving and when. Never miss a delivery again!
 
+---------- 
 
 ## Tech stack
 * python
@@ -15,8 +16,12 @@ Track all your package deliveries in one place. Get real-time updates on where y
 * scraperapi
 
 
+---------- 
+
+
 ## Supported delivery carriers
 100+ carriers supported by [EasyPost](https://www.easypost.com/carriers)
+
 **plus:**
 * ECom Express
 * NZ Post
@@ -26,7 +31,10 @@ Track all your package deliveries in one place. Get real-time updates on where y
 * Amazon
 
 
-### To run this locally or in your production environment, you'll need your own API keys for:
+---------- 
+
+
+### To run this locally or in your production environment, you'll need to create your own API keys for:
 * [EasyPost](https://www.easypost.com/)
 * [Mailgun](https://www.mailgun.com/)
 * [ngrok](https://ngrok.com/)
