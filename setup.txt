@@ -91,7 +91,8 @@ python3 -m flask run
 cp ngrok.yml /home/ethanteng_gmail_com/.ngrok2
 [add ngrok_auth_token to ngrok.yml]
 cd /home/ethanteng_gmail_com
-nohup ./ngrok start --all --config="/home/ethanteng_gmail_com/.ngrok2/ngrok.yml" &
+#nohup ./ngrok start --all --config="/home/ethanteng_gmail_com/.ngrok2/ngrok.yml" &
+nohup ngrok start --all --config="/root/snap/ngrok/89/.config/ngrok/ngrok.yml" &
 
 
 ### Set up cron job for daily schedule emails & checking status of custom carrier-fulfilled packages
